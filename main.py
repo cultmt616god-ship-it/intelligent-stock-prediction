@@ -5,7 +5,7 @@ Created on Fri Sep 27 14:36:49 2019
 @author: Kaushik
 """
 #**************** IMPORT PACKAGES ********************
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session, abort
 from alpha_vantage.timeseries import TimeSeries
 import pandas as pd
 import numpy as np
@@ -26,6 +26,11 @@ from news_sentiment import retrieving_news_polarity, finviz_finvader_sentiment
 import nltk
 nltk.download('punkt')
 nltk.download('vader_lexicon')
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from decimal import Decimal
+from functools import wraps
+import secrets
 
 # Ignore Warnings
 import warnings
@@ -35,6 +40,152 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 #***************** FLASK *****************************
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'CHANGE_ME_IN_PRODUCTION')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///jks_management.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
+    wallet_balance = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login_at = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean, default=True)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    symbol = db.Column(db.String(16), unique=True, nullable=False)
+    name = db.Column(db.String(255))
+    exchange = db.Column(db.String(64))
+    sector = db.Column(db.String(128))
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class Broker(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255))
+    commission_rate = db.Column(db.Numeric(5, 2), nullable=False, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class PortfolioItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=0)
+    average_buy_price = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user = db.relationship('User', backref=db.backref('portfolio_items', lazy=True))
+    company = db.relationship('Company')
+
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+    txn_type = db.Column(db.String(16), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(12, 2), nullable=False)
+    total_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    description = db.Column(db.String(255))
+    broker_id = db.Column(db.Integer, db.ForeignKey('broker.id'))
+    commission_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    user = db.relationship('User', backref=db.backref('transactions', lazy=True))
+    company = db.relationship('Company')
+    broker = db.relationship('Broker')
+
+
+class Dividend(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    portfolio_item_id = db.Column(db.Integer, db.ForeignKey('portfolio_item.id'), nullable=False)
+    amount_per_share = db.Column(db.Numeric(12, 4), nullable=False)
+    total_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    payable_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    portfolio_item = db.relationship('PortfolioItem', backref=db.backref('dividends', lazy=True))
+
+
+def generate_csrf_token():
+    token = session.get('csrf_token')
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session['csrf_token'] = token
+    return token
+
+
+def verify_csrf():
+    token = session.get('csrf_token')
+    form_token = request.form.get('csrf_token')
+    if not token or not form_token or token != form_token:
+        abort(400)
+
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+
+def login_required(role=None):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            user_id = session.get('user_id')
+            user_role = session.get('user_role')
+            if not user_id:
+                return redirect(url_for('login'))
+            if role and user_role != role:
+                abort(403)
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+def get_current_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return User.query.get(user_id)
+
+
+def get_latest_close_price(symbol):
+    end = datetime.now()
+    start = end - dt.timedelta(days=10)
+    data = yf.download(symbol, start=start, end=end)
+    if data.empty:
+        return None
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
+    return float(data['Close'].iloc[-1])
+
+
+def get_active_broker():
+    return Broker.query.filter_by(is_active=True).order_by(Broker.id.asc()).first()
+
+
+def calculate_commission(total_amount, broker):
+    if not broker:
+        return Decimal('0')
+    try:
+        rate = Decimal(broker.commission_rate) / Decimal('100')
+    except Exception:
+        return Decimal('0')
+    commission = total_amount * rate
+    return commission.quantize(Decimal('0.01'))
+
+
+with app.app_context():
+    db.create_all()
 
 #To control caching so as to save and retrieve plot figs on client side
 @app.after_request
@@ -43,6 +194,349 @@ def add_header(response):
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Expires'] = '0'
     return response
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        verify_csrf()
+        email = request.form.get('email', '').strip().lower()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        if not email or not username or not password or not confirm_password:
+            flash('All fields are required.', 'danger')
+            return render_template('register.html', email=email, username=username)
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('register.html', email=email, username=username)
+        existing = User.query.filter((User.email == email) | (User.username == username)).first()
+        if existing:
+            flash('Email or username already registered.', 'danger')
+            return render_template('register.html', email=email, username=username)
+        password_hash = generate_password_hash(password)
+        user = User(email=email, username=username, password_hash=password_hash, role='user')
+        db.session.add(user)
+        db.session.commit()
+        flash('Registration successful. Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        verify_csrf()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password) or not user.is_active:
+            flash('Invalid credentials.', 'danger')
+            return render_template('login.html', email=email)
+        session.clear()
+        session['user_id'] = user.id
+        session['user_role'] = user.role
+        user.last_login_at = datetime.utcnow()
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+
+@app.route('/dashboard')
+@login_required()
+def dashboard():
+    user = get_current_user()
+    items = PortfolioItem.query.filter_by(user_id=user.id).all()
+    transactions = Transaction.query.filter_by(user_id=user.id).order_by(Transaction.created_at.desc()).limit(20).all()
+    total_invested = Decimal('0')
+    total_current = Decimal('0')
+    for item in items:
+        invested = Decimal(item.average_buy_price) * Decimal(item.quantity)
+        total_invested += invested
+        last_price = get_latest_close_price(item.company.symbol) or float(item.average_buy_price)
+        total_current += Decimal(str(last_price)) * Decimal(item.quantity)
+    return render_template('dashboard.html', user=user, items=items, transactions=transactions,
+                           total_invested=total_invested, total_current=total_current)
+
+
+@app.route('/trade/buy', methods=['POST'])
+@login_required()
+def trade_buy():
+    verify_csrf()
+    user = get_current_user()
+    symbol = request.form.get('symbol', '').strip().upper()
+    quantity_raw = request.form.get('quantity', '0').strip()
+    try:
+        quantity = int(quantity_raw)
+    except ValueError:
+        flash('Quantity must be an integer.', 'danger')
+        return redirect(url_for('dashboard'))
+    if quantity <= 0:
+        flash('Quantity must be greater than zero.', 'danger')
+        return redirect(url_for('dashboard'))
+    if not symbol:
+        flash('Symbol is required.', 'danger')
+        return redirect(url_for('dashboard'))
+    price = get_latest_close_price(symbol)
+    if price is None:
+        flash('Unable to fetch latest price for symbol.', 'danger')
+        return redirect(url_for('dashboard'))
+    total = Decimal(str(price)) * Decimal(quantity)
+    broker = get_active_broker()
+    commission = calculate_commission(total, broker)
+    if user.wallet_balance < total + commission:
+        flash('Insufficient wallet balance including commission.', 'danger')
+        return redirect(url_for('dashboard'))
+    company = Company.query.filter_by(symbol=symbol).first()
+    if not company:
+        company = Company(symbol=symbol, name=symbol)
+        db.session.add(company)
+        db.session.flush()
+    item = PortfolioItem.query.filter_by(user_id=user.id, company_id=company.id).first()
+    if item:
+        current_total = Decimal(item.average_buy_price) * Decimal(item.quantity)
+        new_total = current_total + total
+        new_quantity = item.quantity + quantity
+        item.average_buy_price = new_total / Decimal(new_quantity)
+        item.quantity = new_quantity
+    else:
+        item = PortfolioItem(user_id=user.id, company_id=company.id, quantity=quantity,
+                             average_buy_price=total / Decimal(quantity))
+        db.session.add(item)
+    user.wallet_balance = user.wallet_balance - (total + commission)
+    if broker and commission > 0:
+        description = f'Simulated buy order via {broker.name} ({broker.commission_rate}% commission)'
+    else:
+        description = 'Simulated buy order'
+    txn = Transaction(user_id=user.id, company_id=company.id, txn_type='BUY', quantity=quantity,
+                      price=Decimal(str(price)), total_amount=total,
+                      commission_amount=commission, broker_id=broker.id if broker else None,
+                      description=description)
+    db.session.add(txn)
+    db.session.commit()
+    flash('Buy order executed in simulated portfolio.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/trade/sell', methods=['POST'])
+@login_required()
+def trade_sell():
+    verify_csrf()
+    user = get_current_user()
+    symbol = request.form.get('symbol', '').strip().upper()
+    quantity_raw = request.form.get('quantity', '0').strip()
+    try:
+        quantity = int(quantity_raw)
+    except ValueError:
+        flash('Quantity must be an integer.', 'danger')
+        return redirect(url_for('dashboard'))
+    if quantity <= 0:
+        flash('Quantity must be greater than zero.', 'danger')
+        return redirect(url_for('dashboard'))
+    if not symbol:
+        flash('Symbol is required.', 'danger')
+        return redirect(url_for('dashboard'))
+    company = Company.query.filter_by(symbol=symbol).first()
+    if not company:
+        flash('No holdings for this symbol.', 'danger')
+        return redirect(url_for('dashboard'))
+    item = PortfolioItem.query.filter_by(user_id=user.id, company_id=company.id).first()
+    if not item or item.quantity < quantity:
+        flash('Not enough shares to sell.', 'danger')
+        return redirect(url_for('dashboard'))
+    price = get_latest_close_price(symbol)
+    if price is None:
+        flash('Unable to fetch latest price for symbol.', 'danger')
+        return redirect(url_for('dashboard'))
+    total = Decimal(str(price)) * Decimal(quantity)
+    broker = get_active_broker()
+    commission = calculate_commission(total, broker)
+    item.quantity = item.quantity - quantity
+    if item.quantity == 0:
+        db.session.delete(item)
+    user.wallet_balance = user.wallet_balance + (total - commission)
+    if broker and commission > 0:
+        description = f'Simulated sell order via {broker.name} ({broker.commission_rate}% commission)'
+    else:
+        description = 'Simulated sell order'
+    txn = Transaction(user_id=user.id, company_id=company.id, txn_type='SELL', quantity=quantity,
+                      price=Decimal(str(price)), total_amount=total,
+                      commission_amount=commission, broker_id=broker.id if broker else None,
+                      description=description)
+    db.session.add(txn)
+    db.session.commit()
+    flash('Sell order executed in simulated portfolio.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/funds/topup', methods=['POST'])
+@login_required()
+def funds_topup():
+    verify_csrf()
+    user = get_current_user()
+    amount_raw = request.form.get('amount', '0').strip()
+    try:
+        amount = Decimal(amount_raw)
+    except Exception:
+        flash('Invalid amount.', 'danger')
+        return redirect(url_for('dashboard'))
+    if amount <= 0:
+        flash('Amount must be greater than zero.', 'danger')
+        return redirect(url_for('dashboard'))
+    user.wallet_balance = user.wallet_balance + amount
+    db.session.commit()
+    flash('Wallet balance updated for simulation.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/dividends/record', methods=['POST'])
+@login_required()
+def record_dividend():
+    verify_csrf()
+    user = get_current_user()
+    symbol = request.form.get('symbol', '').strip().upper()
+    amount_per_share_raw = request.form.get('amount_per_share', '0').strip()
+    try:
+        amount_per_share = Decimal(amount_per_share_raw)
+    except Exception:
+        flash('Invalid dividend amount.', 'danger')
+        return redirect(url_for('dashboard'))
+    if amount_per_share <= 0:
+        flash('Dividend amount must be greater than zero.', 'danger')
+        return redirect(url_for('dashboard'))
+    company = Company.query.filter_by(symbol=symbol).first()
+    if not company:
+        flash('No holdings for this symbol.', 'danger')
+        return redirect(url_for('dashboard'))
+    item = PortfolioItem.query.filter_by(user_id=user.id, company_id=company.id).first()
+    if not item or item.quantity <= 0:
+        flash('No holdings for this symbol.', 'danger')
+        return redirect(url_for('dashboard'))
+    total_amount = amount_per_share * Decimal(item.quantity)
+    dividend = Dividend(portfolio_item_id=item.id, amount_per_share=amount_per_share,
+                        total_amount=total_amount)
+    user.wallet_balance = user.wallet_balance + total_amount
+    txn = Transaction(user_id=user.id, company_id=company.id, txn_type='DIVIDEND', quantity=item.quantity,
+                      price=amount_per_share, total_amount=total_amount,
+                      commission_amount=Decimal('0'), broker_id=None,
+                      description='Dividend payout recorded')
+    db.session.add(dividend)
+    db.session.add(txn)
+    db.session.commit()
+    flash('Dividend recorded and wallet credited.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/admin')
+@login_required(role='admin')
+def admin_dashboard():
+    user_count = User.query.count()
+    active_users = User.query.filter_by(is_active=True).count()
+    broker_count = Broker.query.count()
+    transaction_count = Transaction.query.count()
+    company_count = Company.query.count()
+    recent_transactions = Transaction.query.order_by(Transaction.created_at.desc()).limit(25).all()
+    brokers = Broker.query.order_by(Broker.name.asc()).all()
+    companies = Company.query.order_by(Company.symbol.asc()).all()
+
+    all_transactions = Transaction.query.all()
+    total_commission = Decimal('0')
+    total_volume = 0
+    txn_type_counts = {}
+    symbol_totals = {}
+    for t in all_transactions:
+        if t.commission_amount is not None:
+            total_commission += Decimal(t.commission_amount)
+        if t.txn_type in ('BUY', 'SELL'):
+            total_volume += t.quantity
+        txn_type_counts[t.txn_type] = txn_type_counts.get(t.txn_type, 0) + 1
+        symbol = t.company.symbol if t.company else None
+        if symbol:
+            data = symbol_totals.setdefault(symbol, {'quantity': 0, 'value': Decimal('0')})
+            data['quantity'] += t.quantity
+            if t.total_amount is not None:
+                data['value'] += Decimal(t.total_amount)
+
+    txn_type_labels = list(txn_type_counts.keys())
+    txn_type_values = list(txn_type_counts.values())
+
+    top_symbols_sorted = sorted(symbol_totals.items(), key=lambda kv: kv[1]['value'], reverse=True)[:5]
+    top_symbol_labels = [s for s, _ in top_symbols_sorted]
+    top_symbol_values = [float(stats['value']) for _, stats in top_symbols_sorted]
+
+    return render_template(
+        'admin_dashboard.html',
+        user_count=user_count,
+        active_users=active_users,
+        broker_count=broker_count,
+        transaction_count=transaction_count,
+        company_count=company_count,
+        total_commission=total_commission,
+        total_volume=total_volume,
+        recent_transactions=recent_transactions,
+        brokers=brokers,
+        txn_type_labels=txn_type_labels,
+        txn_type_values=txn_type_values,
+        top_symbol_labels=top_symbol_labels,
+        top_symbol_values=top_symbol_values,
+        companies=companies,
+    )
+
+
+@app.route('/admin/brokers', methods=['POST'])
+@login_required(role='admin')
+def admin_add_broker():
+    verify_csrf()
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    commission_raw = request.form.get('commission_rate', '0').strip()
+    if not name:
+        flash('Broker name is required.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    try:
+        commission = Decimal(commission_raw)
+    except Exception:
+        flash('Invalid commission rate.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    if commission < 0:
+        flash('Commission rate cannot be negative.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    broker = Broker(name=name, email=email or None, commission_rate=commission)
+    db.session.add(broker)
+    db.session.commit()
+    flash('Broker added.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/companies', methods=['POST'])
+@login_required(role='admin')
+def admin_add_company():
+    verify_csrf()
+    symbol = request.form.get('symbol', '').strip().upper()
+    name = request.form.get('name', '').strip()
+    exchange = request.form.get('exchange', '').strip()
+    sector = request.form.get('sector', '').strip()
+    is_active_raw = request.form.get('is_active')
+    if not symbol:
+        flash('Company symbol is required.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    company = Company.query.filter_by(symbol=symbol).first()
+    if not company:
+        company = Company(symbol=symbol)
+        db.session.add(company)
+    company.name = name or symbol
+    company.exchange = exchange or None
+    company.sector = sector or None
+    company.is_active = bool(is_active_raw)
+    db.session.commit()
+    flash('Company saved.', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/')
 def index():

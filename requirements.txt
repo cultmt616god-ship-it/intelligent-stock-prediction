@@ -16,3 +16,4 @@ gunicorn
 htmldate
 finvader
 aiohttp
+flask_sqlalchemy

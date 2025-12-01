@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JKS - Admin Dashboard</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-2.png') }}">
+    <link href="{{ url_for('static', filename='bootstrap.min-RES.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='helper.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style-RES.css') }}" rel="stylesheet">
+</head>
+<body class="header-fix fix-sidebar">
+<div id="main-wrapper">
+    <div class="left-sidebar">
+        <div class="scroll-sidebar">
+            <nav class="sidebar-nav">
+                <ul id="sidebar-menu">
+                    <li class="nav-devider"></li>
+                    <br>
+                    <li class="nav-label"><a href="{{ url_for('index') }}">HOME</a></li>
+                    <li class="nav-label"><a href="{{ url_for('index') }}#home">PREDICT THE FUTURE</a></li>
+                    <li class="nav-label"><a href="{{ url_for('dashboard') }}">USER DASHBOARD</a></li>
+                    <li class="nav-label"><a href="{{ url_for('admin_dashboard') }}">ADMIN DASHBOARD</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="page-wrapper">
+        <div class="row page-titles">
+            <div class="col-md-6 align-self-center">
+                <h3 class="text-primary">Admin Monitoring & Control</h3>
+            </div>
+            <div class="col-md-6 align-self-center text-right">
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-danger">Logout</a>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-primary p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-user f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ user_count }}</h2>
+                                <p class="m-b-0 text-white">TOTAL USERS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-success p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-check-box f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ active_users }}</h2>
+                                <p class="m-b-0 text-white">ACTIVE USERS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-warning p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-briefcase f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ broker_count }}</h2>
+                                <p class="m-b-0 text-white">BROKERS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-danger p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-receipt f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ transaction_count }}</h2>
+                                <p class="m-b-0 text-white">TRANSACTIONS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-primary p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-briefcase f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ company_count }}</h2>
+                                <p class="m-b-0 text-white">COMPANIES</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-success p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-stats-up f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ '%.2f'|format(total_commission or 0) }}</h2>
+                                <p class="m-b-0 text-white">TOTAL COMMISSION</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-warning p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-bar-chart f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ total_volume }}</h2>
+                                <p class="m-b-0 text-white">TOTAL VOLUME (SHARES)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Register Broker</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('admin_add_broker') }}" class="form-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="broker_name" class="sr-only">Name</label>
+                                    <input type="text" class="form-control" id="broker_name" name="name" placeholder="Broker name">
+                                </div>
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="broker_email" class="sr-only">Email</label>
+                                    <input type="email" class="form-control" id="broker_email" name="email" placeholder="Email">
+                                </div>
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="commission_rate" class="sr-only">Commission</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="commission_rate" name="commission_rate" placeholder="Commission %">
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2">Add Broker</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Brokers</h4>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Commission %</th>
+                                        <th>Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for b in brokers %}
+                                    <tr>
+                                        <td>{{ b.name }}</td>
+                                        <td>{{ b.email or '-' }}</td>
+                                        <td>{{ '%.2f'|format(b.commission_rate) }}</td>
+                                        <td>{{ 'Yes' if b.is_active else 'No' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4">No brokers registered.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Company Profiles</h4>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>Exchange</th>
+                                        <th>Sector</th>
+                                        <th>Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in companies %}
+                                    <tr>
+                                        <td>{{ c.symbol }}</td>
+                                        <td>{{ c.name or '-' }}</td>
+                                        <td>{{ c.exchange or '-' }}</td>
+                                        <td>{{ c.sector or '-' }}</td>
+                                        <td>{{ 'Yes' if c.is_active else 'No' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5">No companies configured yet. They will be created automatically when users trade, or you can add them below.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Manage Company</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('admin_add_company') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <label for="company_symbol">Symbol</label>
+                                    <input type="text" class="form-control" id="company_symbol" name="symbol" placeholder="e.g. AAPL" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="company_name">Name</label>
+                                    <input type="text" class="form-control" id="company_name" name="name" placeholder="Company name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company_exchange">Exchange</label>
+                                    <input type="text" class="form-control" id="company_exchange" name="exchange" placeholder="e.g. NASDAQ">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company_sector">Sector</label>
+                                    <input type="text" class="form-control" id="company_sector" name="sector" placeholder="e.g. Technology">
+                                </div>
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="company_active" name="is_active" checked>
+                                    <label class="form-check-label" for="company_active">Active</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Company</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Recent Transactions</h4>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th>Type</th>
+                                        <th>Symbol</th>
+                                        <th>Qty</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in recent_transactions %}
+                                    <tr>
+                                        <td>{{ t.created_at }}</td>
+                                        <td>{{ t.user.username }}</td>
+                                        <td>{{ t.txn_type }}</td>
+                                        <td>{{ t.company.symbol }}</td>
+                                        <td>{{ t.quantity }}</td>
+                                        <td>{{ '%.2f'|format(t.price) }}</td>
+                                        <td>{{ '%.2f'|format(t.total_amount) }}</td>
+                                        <td>{{ t.description or '' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="8">No transactions yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static', filename='jquery-RES.min.js ')}}"></script>
+<script src="{{url_for('static', filename='popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='bootstrap-RES.min.js')}}"></script>
+<script src="{{url_for('static', filename='jquery.slimscroll.js')}}"></script>
+<script src="{{url_for('static', filename='sidebarmenu.js')}}"></script>
+<script src="{{url_for('static', filename='sticky-kit.min.js')}}"></script>
+<script src="{{url_for('static', filename='custom.min.js')}}"></script>
+</body>
+</html>

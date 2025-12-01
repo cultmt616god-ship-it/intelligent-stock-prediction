@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Prediction System - Diagram Gallery</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            er: {
+                useMaxWidth: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+        
+        .diagram-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .diagram-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .diagram-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .mermaid {
+            width: 100%;
+            height: auto;
+            min-height: 300px;
+            background-color: white;
+            border-radius: 4px;
+        }
+        
+        .diagram-description {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Stock Market Prediction System</h1>
+        <p class="subtitle">Diagram Gallery - System Architecture and Design</p>
+    </header>
+    
+    <main class="gallery">
+        <div class="diagram-card">
+            <h2 class="diagram-title">Level 0 Data Flow Diagram</h2>
+            <div class="mermaid">
+                flowchart LR
+                    %% External Entities
+                    User[["User"]]
+                    Admin[["Admin"]]
+                    MarketData[["Market Data APIs"]]
+
+                    %% Processes
+                    P1["P1: Authentication"]
+                    P2["P2: Portfolio Management"]
+                    P3["P3: Prediction Engine"]
+                    P4["P4: Sentiment Analysis"]
+                    P5["P5: Admin Monitoring"]
+
+                    %% Data Stores
+                    DS_User[("D1: User DB")]
+                    DS_Company[("D2: Company DB")]
+                    DS_Portfolio[("D3: Portfolio DB")]
+                    DS_Txn[("D4: Transaction DB")]
+                    DS_Dividend[("D5: Dividend DB")]
+
+                    %% Flows
+                    User -->|Login/Logout| P1
+                    P1 -->|User details| DS_User
+                    P1 -->|Auth result| User
+
+                    User -->|Trade / Dividend Requests| P2
+                    P2 -->|Portfolio updates| DS_Portfolio
+                    P2 -->|Transactions| DS_Txn
+                    P2 -->|Dividends| DS_Dividend
+                    P2 -->|Dashboard views| User
+
+                    P2 -->|Symbol & history request| P3
+                    P3 -->|Historical data & predictions| P2
+
+                    P3 -->|Price/News requests| MarketData
+                    MarketData -->|Price/News data| P3
+
+                    P3 -->|News text| P4
+                    P4 -->|Sentiment scores| P3
+
+                    Admin -->|Monitoring requests| P5
+                    P5 -->|Aggregated stats| Admin
+
+                    P5 --> DS_User
+                    P5 --> DS_Company
+                    P5 --> DS_Portfolio
+                    P5 --> DS_Txn
+                    P5 --> DS_Dividend
+            </div>
+            <div class="diagram-description">
+                <p>This diagram shows the high-level data flow of the system, illustrating how external entities (Users, Admins, and Market Data APIs) interact with the core processes and data stores.</p>
+            </div>
+        </div>
+        
+        <div class="diagram-card">
+            <h2 class="diagram-title">Portfolio Management DFD (Level 1)</h2>
+            <div class="mermaid">
+                flowchart LR
+                    User["User"]
+
+                    subgraph P2["P2: Portfolio Management (Level 1)"]
+                        P2_1["P2.1: Place Buy Order"]
+                        P2_2["P2.2: Place Sell Order"]
+                        P2_3["P2.3: Record Dividend"]
+                        P2_4["P2.4: View Portfolio & Wallet"]
+                    end
+
+                    DS_User[(D1: User DB - Wallet)]
+                    DS_Portfolio[(D3: Portfolio DB)]
+                    DS_Txn[(D4: Transaction DB)]
+                    DS_Dividend[(D5: Dividend DB)]
+
+                    User -->|"Buy request: symbol & qty"| P2_1
+                    P2_1 -->|"Update wallet & holdings"| DS_User
+                    P2_1 -->|"Insert BUY transaction"| DS_Txn
+                    P2_1 -->|"Updated view"| User
+
+                    User -->|"Sell request: symbol & qty"| P2_2
+                    P2_2 -->|"Update wallet & holdings"| DS_User
+                    P2_2 -->|"Insert SELL transaction"| DS_Txn
+                    P2_2 -->|"Updated view"| User
+
+                    User -->|"Dividend info: symbol & amount"| P2_3
+                    P2_3 -->|"Increase wallet"| DS_User
+                    P2_3 -->|"Insert dividend record"| DS_Dividend
+                    P2_3 -->|"Insert DIVIDEND transaction"| DS_Txn
+
+                    User -->|"Dashboard request"| P2_4
+                    P2_4 -->|"Read wallet"| DS_User
+                    P2_4 -->|"Read holdings"| DS_Portfolio
+                    P2_4 -->|"Read history"| DS_Txn
+                    P2_4 -->|"Dashboard data"| User
+            </div>
+            <div class="diagram-description">
+                <p>This diagram provides a detailed view of the portfolio management process, showing how buy orders, sell orders, dividend recording, and portfolio viewing are handled within the system.</p>
+            </div>
+        </div>
+        
+        <div class="diagram-card">
+            <h2 class="diagram-title">Entity Relationship Diagram</h2>
+            <div class="mermaid">
+                erDiagram
+                    USER {
+                        int id
+                        string email
+                        string username
+                        string password_hash
+                        string role
+                        decimal wallet_balance
+                        datetime created_at
+                        datetime last_login_at
+                        bool is_active
+                    }
+
+                    COMPANY {
+                        int id
+                        string symbol
+                        string name
+                        bool is_active
+                    }
+
+                    BROKER {
+                        int id
+                        string name
+                        decimal commission_rate
+                        bool is_active
+                    }
+
+                    PORTFOLIO_ITEM {
+                        int id
+                        int user_id
+                        int company_id
+                        int quantity
+                        decimal average_buy_price
+                    }
+
+                    TRANSACTION {
+                        int id
+                        int user_id
+                        int company_id
+                        int broker_id
+                        string txn_type
+                        int quantity
+                        decimal price
+                        decimal total_amount
+                        decimal commission_amount
+                        datetime created_at
+                        string description
+                    }
+
+                    DIVIDEND {
+                        int id
+                        int user_id
+                        int company_id
+                        decimal amount
+                        datetime created_at
+                    }
+
+                    USER ||--o{ PORTFOLIO_ITEM : "owns"
+                    COMPANY ||--o{ PORTFOLIO_ITEM : "is held in"
+
+                    USER ||--o{ TRANSACTION : "executes"
+                    COMPANY ||--o{ TRANSACTION : "is traded in"
+                    BROKER ||--o{ TRANSACTION : "charges commission on"
+
+                    USER ||--o{ DIVIDEND : "receives"
+                    COMPANY ||--o{ DIVIDEND : "issues"
+            </div>
+            <div class="diagram-description">
+                <p>This entity relationship diagram shows the database schema of the system, including all tables and their relationships. It illustrates how users, companies, brokers, portfolio items, transactions, and dividends are connected.</p>
+            </div>
+        </div>
+        
+        <div class="diagram-card">
+            <h2 class="diagram-title">Use Case Diagram</h2>
+            <div class="mermaid">
+                flowchart TB
+                    actorUser(["User"])
+                    actorAdmin(["Admin"])
+
+                    subgraph System["Share Market Management and Prediction System"]
+                        UC_Login[["Login / Register"]]
+                        UC_ViewDashboard[["View Dashboard & Holdings"]]
+                        UC_Trade[["Perform Buy/Sell Trades"]]
+                        UC_Dividend[["Record Dividends"]]
+                        UC_ViewPrediction[["View Price Prediction & Sentiment"]]
+                        UC_ManageCompanies[["Manage Companies"]]
+                        UC_ManageBrokers[["Manage Brokers & Commissions"]]
+                        UC_Monitor[["Monitor Transactions & Statistics"]]
+                    end
+
+                    actorUser --> UC_Login
+                    actorUser --> UC_ViewDashboard
+                    actorUser --> UC_Trade
+                    actorUser --> UC_Dividend
+                    actorUser --> UC_ViewPrediction
+
+                    actorAdmin --> UC_Login
+                    actorAdmin --> UC_ManageCompanies
+                    actorAdmin --> UC_ManageBrokers
+                    actorAdmin --> UC_Monitor
+            </div>
+            <div class="diagram-description">
+                <p>This use case diagram illustrates the functional requirements of the system from the perspective of users and administrators, showing what actions each role can perform.</p>
+            </div>
+        </div>
+        
+        <div class="diagram-card">
+            <h2 class="diagram-title">Project Gantt Chart</h2>
+            <div class="mermaid">
+                gantt
+                    dateFormat  YYYY-MM-DD
+                    title Project Plan - Share Market Management and Prediction System
+
+                    section Requirements & Review
+                    Requirements Gathering        :done,    reqs, 2025-01-01, 2025-01-14
+                    Literature & Tech Selection   :done,    lit,  2025-01-15, 2025-01-28
+
+                    section Design
+                    SRS and High-Level Design     :active,  design1, 2025-01-29, 2025-02-11
+                    DB & Diagram Design           :         design2, 2025-02-12, 2025-02-25
+
+                    section Implementation
+                    Prediction Module             :         impl1, 2025-02-26, 2025-03-18
+                    Management Dashboard & Trades :         impl2, 2025-03-19, 2025-04-09
+
+                    section Testing & Documentation
+                    Testing & Validation          :         test,  2025-04-10, 2025-04-23
+                    Report & Presentation         :         doc,   2025-04-24, 2025-05-07
+            </div>
+            <div class="diagram-description">
+                <p>This Gantt chart shows the project timeline, illustrating the various phases of development from requirements gathering through implementation and testing.</p>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Stock Market Prediction System - Diagram Gallery</p>
+        <p>All diagrams rendered with Mermaid.js using neutral theme</p>
+    </footer>
+</body>
+</html>

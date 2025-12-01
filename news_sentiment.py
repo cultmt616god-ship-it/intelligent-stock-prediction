@@ -31,6 +31,7 @@ from enum import Enum
 import hashlib
 from typing import List, Dict, Optional, Union
 import logging
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -815,6 +816,7 @@ class ComprehensiveSentimentAnalyzer:
                 compound = article.get('sentiment_score', 0)
                 total_compound += compound
                 news_titles.append(article['title'])
+                sentiments.append({'title': article['title'], 'compound': compound})
                 
                 if compound > 0.05:
                     pos_count += 1
@@ -846,6 +848,7 @@ class ComprehensiveSentimentAnalyzer:
                 
                 total_compound += compound
                 news_titles.append(article['title'])
+                sentiments.append({'title': article['title'], 'compound': compound})
                 
                 if compound > 0.05:
                     pos_count += 1
@@ -856,6 +859,15 @@ class ComprehensiveSentimentAnalyzer:
                 
         # Calculate global polarity
         global_polarity = total_compound / len(all_articles) if all_articles else 0
+        
+        # Optional debug hook: log per-article sentiment when enabled
+        if os.environ.get('NEWS_SENTIMENT_DEBUG') == '1':
+            try:
+                sample = sentiments[:min(len(sentiments), 10)]
+                for s in sample:
+                    logger.info(f"[{ticker}] {s['compound']:.3f} - {s['title']}")
+            except Exception as e:
+                logger.warning(f"Sentiment debug hook failed: {e}")
         
         # Pad neutral count if no articles found
         if len(all_articles) == 0:
@@ -898,6 +910,49 @@ class ComprehensiveSentimentAnalyzer:
             # Save data for persistence
         except Exception as e:
             print(f"Chart error: {e}")
+
+    def log_sentiment_distribution(self, articles: List[Dict]):
+        """Monitor confidence distribution for a batch of articles.
+
+        Uses precomputed sentiment_score when available, otherwise mirrors
+        get_sentiment fallback: FinVADER if available, else standard VADER.
+        """
+        try:
+            compounds = []
+            for article in articles:
+                if 'sentiment_score' in article:
+                    compounds.append(article['sentiment_score'])
+                elif 'text' in article:
+                    text = article['text'] or ""
+                    if not text.strip():
+                        compounds.append(0.0)
+                        continue
+                    if FINVADER_AVAILABLE:
+                        try:
+                            score = finvader(text)
+                            if isinstance(score, dict):
+                                compounds.append(score.get('compound', 0.0))
+                            else:
+                                compounds.append(float(score))
+                        except Exception:
+                            scores = self.sid.polarity_scores(text)
+                            compounds.append(scores.get('compound', 0.0))
+                    else:
+                        scores = self.sid.polarity_scores(text)
+                        compounds.append(scores.get('compound', 0.0))
+                else:
+                    compounds.append(0.0)
+
+            if compounds:
+                mean_sentiment = np.mean(compounds)
+                std_sentiment = np.std(compounds)
+                extremes = sum(1 for s in compounds if abs(s) > 0.5)
+
+                logger.info(f"Sentiment Distribution - Mean: {mean_sentiment:.3f}, Std: {std_sentiment:.3f}")
+                logger.info(f"Extreme Sentiments: {extremes} / {len(compounds)}")
+                logger.info(f"Compound scores range: [{min(compounds):.3f}, {max(compounds):.3f}]")
+        except Exception as e:
+            logger.error(f"Error logging sentiment distribution: {e}")
 
     # Advanced Features Implementation
     
@@ -1023,39 +1078,88 @@ class ComprehensiveSentimentAnalyzer:
             except Exception as e:
                 logger.error(f"FinVADER failed: {e}")
                 result = {'compound': 0.0, 'pos': 0.0, 'neu': 1.0, 'neg': 0.0}  # Neutral fallback
-                self._set_in_cache(cache_key, result)
-                return result
-        
-        return _robust_finvader_inner(text)
 
-    def log_sentiment_distribution(self, articles: List[Dict]):
-        """
-        Monitor confidence distribution
-        """
+# Error Handling and Monitoring Features
+    
+def robust_finvader(self, text: str) -> Dict:
+    """
+    Production-grade FinVADER with retries
+    """
+    # Check cache first
+    cache_key = self._get_cache_key("finvader", text)
+    cached_result = self._get_from_cache(cache_key)
+    if cached_result:
+        return cached_result
+    
+    if not TENACITY_AVAILABLE:
+        # Fallback implementation without tenacity
         try:
-            compounds = []
-            for article in articles:
-                if 'sentiment_score' in article:
-                    compounds.append(article['sentiment_score'])
-                elif 'text' in article and FINVADER_AVAILABLE:
-                    try:
-                        score = finvader(article['text'])
-                        compounds.append(score['compound'])
-                    except:
-                        compounds.append(0.0)
-                else:
-                    compounds.append(0.0)
-            
-            if compounds:
-                mean_sentiment = np.mean(compounds)
-                std_sentiment = np.std(compounds)
-                extremes = sum(1 for s in compounds if abs(s) > 0.5)
-                
-                logger.info(f"Sentiment Distribution - Mean: {mean_sentiment:.3f}, Std: {std_sentiment:.3f}")
-                logger.info(f"Extreme Sentiments: {extremes} / {len(compounds)}")
-                logger.info(f"Compound scores range: [{min(compounds):.3f}, {max(compounds):.3f}]")
+            result = finvader(text)
+            self._set_in_cache(cache_key, result)
+            return result
         except Exception as e:
-            logger.error(f"Error logging sentiment distribution: {e}")
+            logger.error(f"FinVADER failed: {e}")
+            result = {'compound': 0.0, 'pos': 0.0, 'neu': 1.0, 'neg': 0.0}  # Neutral fallback
+            self._set_in_cache(cache_key, result)
+            return result
+    
+    # With tenacity retry decorator
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+    def _robust_finvader_inner(text: str):
+        try:
+            result = finvader(text)
+            self._set_in_cache(cache_key, result)
+            return result
+        except Exception as e:
+            logger.error(f"FinVADER failed: {e}")
+            result = {'compound': 0.0, 'pos': 0.0, 'neu': 1.0, 'neg': 0.0}  # Neutral fallback
+            self._set_in_cache(cache_key, result)
+            return result
+    
+    return _robust_finvader_inner(text)
+
+def log_sentiment_distribution(self, articles: List[Dict]):
+    """
+    Monitor confidence distribution.
+    Uses precomputed sentiment_score when available, otherwise mirrors
+    get_sentiment fallback: FinVADER if available, else standard VADER.
+    """
+    try:
+        compounds = []
+        for article in articles:
+            if 'sentiment_score' in article:
+                compounds.append(article['sentiment_score'])
+            elif 'text' in article:
+                text = article['text'] or ""
+                if not text.strip():
+                    compounds.append(0.0)
+                    continue
+                if FINVADER_AVAILABLE:
+                    try:
+                        score = finvader(text)
+                        if isinstance(score, dict):
+                            compounds.append(score.get('compound', 0.0))
+                        else:
+                            compounds.append(float(score))
+                    except Exception:
+                        scores = self.sid.polarity_scores(text)
+                        compounds.append(scores.get('compound', 0.0))
+                else:
+                    scores = self.sid.polarity_scores(text)
+                    compounds.append(scores.get('compound', 0.0))
+            else:
+                compounds.append(0.0)
+
+        if compounds:
+            mean_sentiment = np.mean(compounds)
+            std_sentiment = np.std(compounds)
+            extremes = sum(1 for s in compounds if abs(s) > 0.5)
+
+            logger.info(f"Sentiment Distribution - Mean: {mean_sentiment:.3f}, Std: {std_sentiment:.3f}")
+            logger.info(f"Extreme Sentiments: {extremes} / {len(compounds)}")
+            logger.info(f"Compound scores range: [{min(compounds):.3f}, {max(compounds):.3f}]")
+    except Exception as e:
+        logger.error(f"Error logging sentiment distribution: {e}")
 
 def retrieving_news_polarity(symbol, num_articles=10, 
                            eodhd_api_key=None, 

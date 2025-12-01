@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JKS - Portfolio Dashboard</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-2.png') }}">
+    <link href="{{ url_for('static', filename='bootstrap.min-RES.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='helper.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style-RES.css') }}" rel="stylesheet">
+</head>
+<body class="header-fix fix-sidebar">
+<div id="main-wrapper">
+    <div class="left-sidebar">
+        <div class="scroll-sidebar">
+            <nav class="sidebar-nav">
+                <ul id="sidebar-menu">
+                    <li class="nav-devider"></li>
+                    <br>
+                    <li class="nav-label"><a href="{{ url_for('index') }}">HOME</a></li>
+                    <li class="nav-label"><a href="{{ url_for('index') }}#home">PREDICT THE FUTURE</a></li>
+                    <li class="nav-label"><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="page-wrapper">
+        <div class="row page-titles">
+            <div class="col-md-6 align-self-center">
+                <h3 class="text-primary">Portfolio Dashboard</h3>
+            </div>
+            <div class="col-md-6 align-self-center text-right">
+                <span style="margin-right:15px;">Signed in as {{ user.username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-danger">Logout</a>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-primary p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-wallet f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ '%.2f'|format(user.wallet_balance or 0) }}</h2>
+                                <p class="m-b-0 text-white">WALLET BALANCE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-success p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-pie-chart f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ '%.2f'|format(total_invested) }}</h2>
+                                <p class="m-b-0 text-white">TOTAL INVESTED</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-warning p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-bar-chart f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ '%.2f'|format(total_current) }}</h2>
+                                <p class="m-b-0 text-white">CURRENT VALUE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                    <div class="card bg-danger p-20 h-100">
+                        <div class="media widget-ten">
+                            <div class="media-left meida media-middle">
+                                <span><i class="ti-stats-up f-s-40"></i></span>
+                            </div>
+                            <div class="media-body media-text-right">
+                                <h2 class="text-white">{{ '%.2f'|format(total_current - total_invested) }}</h2>
+                                <p class="m-b-0 text-white">UNREALIZED P/L</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Add Funds (Simulation)</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('funds_topup') }}" class="form-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="amount" class="sr-only">Amount</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="amount" name="amount" placeholder="Amount">
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2">Top Up</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Record Dividend</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('record_dividend') }}" class="form-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="div_symbol" class="sr-only">Symbol</label>
+                                    <input type="text" class="form-control" id="div_symbol" name="symbol" placeholder="Symbol">
+                                </div>
+                                <div class="form-group mb-2 mr-sm-2">
+                                    <label for="amount_per_share" class="sr-only">Amount/Share</label>
+                                    <input type="number" step="0.0001" min="0" class="form-control" id="amount_per_share" name="amount_per_share" placeholder="Amount per share">
+                                </div>
+                                <button type="submit" class="btn btn-success mb-2">Record</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Holdings</h4>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Quantity</th>
+                                        <th>Average Buy Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                    <tr>
+                                        <td>{{ item.company.symbol }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ '%.2f'|format(item.average_buy_price) }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ url_for('trade_buy') }}" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="symbol" value="{{ item.company.symbol }}">
+                                                <input type="number" name="quantity" min="1" class="form-control d-inline" style="width:80px;" placeholder="Qty">
+                                                <button type="submit" class="btn btn-sm btn-success">Buy</button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('trade_sell') }}" class="d-inline ml-1">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="symbol" value="{{ item.company.symbol }}">
+                                                <input type="number" name="quantity" min="1" class="form-control d-inline" style="width:80px;" placeholder="Qty">
+                                                <button type="submit" class="btn btn-sm btn-danger">Sell</button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('predict') }}" class="d-inline ml-1">
+                                                <input type="hidden" name="nm" value="{{ item.company.symbol }}">
+                                                <button type="submit" class="btn btn-sm btn-primary">View Prediction</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4">No holdings yet. Use the trade forms below to start a simulated portfolio.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>New Trade</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3">
+                                    <form method="POST" action="{{ url_for('trade_buy') }}" class="form-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="form-group mb-2 mr-sm-2">
+                                            <label for="buy_symbol" class="sr-only">Symbol</label>
+                                            <input type="text" class="form-control" id="buy_symbol" name="symbol" placeholder="Symbol">
+                                        </div>
+                                        <div class="form-group mb-2 mr-sm-2">
+                                            <label for="buy_quantity" class="sr-only">Quantity</label>
+                                            <input type="number" min="1" class="form-control" id="buy_quantity" name="quantity" placeholder="Quantity">
+                                        </div>
+                                        <button type="submit" class="btn btn-success mb-2">Buy</button>
+                                    </form>
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <form method="POST" action="{{ url_for('trade_sell') }}" class="form-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="form-group mb-2 mr-sm-2">
+                                            <label for="sell_symbol" class="sr-only">Symbol</label>
+                                            <input type="text" class="form-control" id="sell_symbol" name="symbol" placeholder="Symbol">
+                                        </div>
+                                        <div class="form-group mb-2 mr-sm-2">
+                                            <label for="sell_quantity" class="sr-only">Quantity</label>
+                                            <input type="number" min="1" class="form-control" id="sell_quantity" name="quantity" placeholder="Quantity">
+                                        </div>
+                                        <button type="submit" class="btn btn-danger mb-2">Sell</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card h-100">
+                        <div class="card-title">
+                            <h4>Recent Transactions (Billing)</h4>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Symbol</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in transactions %}
+                                    <tr>
+                                        <td>{{ t.created_at }}</td>
+                                        <td>{{ t.txn_type }}</td>
+                                        <td>{{ t.company.symbol }}</td>
+                                        <td>{{ t.quantity }}</td>
+                                        <td>{{ '%.2f'|format(t.price) }}</td>
+                                        <td>{{ '%.2f'|format(t.total_amount) }}</td>
+                                        <td>{{ t.description or '' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7">No transactions yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static', filename='jquery-RES.min.js ')}}"></script>
+<script src="{{url_for('static', filename='popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='bootstrap-RES.min.js')}}"></script>
+<script src="{{url_for('static', filename='jquery.slimscroll.js')}}"></script>
+<script src="{{url_for('static', filename='sidebarmenu.js')}}"></script>
+<script src="{{url_for('static', filename='sticky-kit.min.js')}}"></script>
+<script src="{{url_for('static', filename='custom.min.js')}}"></script>
+</body>
+</html>

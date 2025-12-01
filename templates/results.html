@@ -54,9 +54,7 @@
                     <br>
                     <li class="nav-label"><a href="{{ url_for('index') }}">HOME</a></li>
                     <li class="nav-label"><a href="http://127.0.0.1:5000">PREDICT THE FUTURE</a></li>
-                    <li class="nav-label"><a href="#">DASHBOARD</a></li>
-                    <li class="nav-label"><a href="#">ABOUT</a></li>
-                    <li class="nav-label"><a href="{{ url_for('index', _anchor='contact') }}">CONTACT US</a></li>
+                    <li class="nav-label"><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->
@@ -265,12 +263,12 @@
                 </div>
             </div>
 
-            <!-- Tweets/news + sentiment + forecast -->
+            <!-- News + sentiment + forecast -->
             <div class="row">
                 <div class="col-12 mb-4">
                     <div class="card h-100">
                         <div class="card-title">
-                            <h4>RECENT TWEETS AND NEWS ABOUT {{quote}}</h4>
+                            <h4>RECENT NEWS ABOUT {{quote}}</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -286,22 +284,15 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>
-                                                <div class="round-img">
-                                                    <a href="https://twitter.com/"><img
-                                                            style="padding: 0;width:70px;height: 70px;"
-                                                            src="{{url_for('static', filename='twitter-logo.png')}}"
-                                                            alt=""></a>
-                                                </div>
-                                            </td>
+                                            <td>#</td>
                                             <td>
                                                 {% for i in range(0,12) %}
                                                 {{sentiment_list[i]}}<br>
                                                 {% endfor %}
                                             </td>
-                                            <td><span></span></td>
-                                            <td><span></span></td>
-                                            <td><span class="badge badge-success"></span></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -399,60 +390,7 @@
         </div>
         <!-- End Container fluid  -->
 
-        <!-- footer -->
-        <div class="footer-section-area padding-top-bottom">
-            <div class="container" style="background-color: #1f2b31;">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                        <img src="{{url_for('static', filename='logo-2.png')}}" alt="JKS Logo">
-                        <p style="color:white;">JKS was started with a common goal of serving the finance community
-                            while they make transitions. All our team members bring to table their unique expertise and
-                            experience of stock market which they would like to pass on to future investors.</p>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                        <div>
-                            <h3 style="color:white;padding-top: 20px;padding-left: 0px;">Contact Us</h3>
-                        </div>
-                        <div style="padding-top: 25px;">
-                            <ul style="color:white;">
-                                <li>JKS, Office 206, Hubtown Solaris, Prof. NS Phadke Road, Churchgate (E) Mumbai,
-                                    Maharashtra, India</li>
-                                <li><i class="fa fa-envelope-o fa-2x"></i>info.bom@jks.com</li>
-                                <li><i class="fa fa-phone fa-2x"></i>+91 98 19384052</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                        <div>
-                            <h3 style="color:white;padding-top: 25px;padding-left: 0px;">Quick Links</h3>
-                        </div>
-                        <div class="information">
-                            <ul>
-                                <li><a style="color:white;padding-top: 10px;" href="{{ url_for('index') }}"> <i
-                                            class="fa fa-arrow-right"></i> HOME</a></li>
-                                <li><a style="color:white;" href="#"> <i class="fa fa-arrow-right"></i> DASHBOARD</a>
-                                </li>
-                                <li><a style="color:white;" href="#"> <i class="fa fa-arrow-right"></i> ABOUT</a></li>
-                                <li><a style="color:white;" href="{{ url_for('index', _anchor='contact') }}"> <i
-                                            class="fa fa-arrow-right"></i> CONTACT US</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                        <div>
-                            <h3 style="color:white;padding-top: 20px;padding-left: 0px;">Location</h3>
-                        </div>
-                        <div class="our-service">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d60383.60024757153!2d72.8317!3d18.9325!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x65cbb9c5d81e88aa!2sJKS%20Wealth%20Management%20Pvt.%20Ltd!5e0!3m2!1sen!2sus!4v1571992752493!5m2!1sen!2sus"
-                                width="200" height="200" frameborder="0" style="border:0;padding-left: 0px;"
-                                allowfullscreen="false"></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End footer -->
+        <!-- footer removed: not relevant to management/prediction UI -->
     </div>
     <!-- End Page wrapper  -->
 </div>
