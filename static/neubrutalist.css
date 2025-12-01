@@ -1,0 +1,183 @@
+:root {
+  /* Soothing minimal neubrutalist palette */
+  --nb-bg: #f4f5f0;             /* soft warm grey for body background */
+  --nb-bg-accent: #e2ead4;      /* tint derived from #C9CFA7 */
+  --nb-surface: #fdfdf8;        /* off-white surface instead of pure white */
+  --nb-surface-strong: #ffffff; /* occasional strong surface */
+  --nb-border: #161616;         /* slightly softened near-black border */
+
+  /* Core accent colors from user palette */
+  --nb-soft-olive: #C9CFA7;     /* primary soft olive */
+  --nb-soft-blue: #A9DDF9;      /* secondary soft blue */
+
+  /* Semantic colors derived from the above */
+  --nb-primary: #7fbadf;        /* calm blue for primary actions */
+  --nb-accent: #a3c89b;         /* muted green/olive accent */
+  --nb-warning: #f2c288;        /* softened amber, not aggressive */
+  --nb-success: #7fbf9b;        /* desaturated success green */
+  --nb-danger: #e68a8a;         /* muted red for danger without harshness */
+
+  --nb-text: #181a1f;
+  --nb-text-muted: #6b7280;
+}
+
+body {
+  background: radial-gradient(circle at top left, var(--nb-bg-accent) 0, var(--nb-bg) 40%, #f7f7f3 100%) !important;
+  color: var(--nb-text) !important;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+}
+
+.card,
+.navbar,
+.left-sidebar,
+.page-wrapper,
+.login_page,
+.log_in_box,
+.table,
+input.form-control,
+button,
+.btn,
+.alert {
+  border-radius: 6px !important;
+  border: 2px solid var(--nb-border) !important;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+.card {
+  background: var(--nb-surface) !important;
+}
+
+.navbar,
+.left-sidebar {
+  background: linear-gradient(135deg, var(--nb-soft-blue), var(--nb-soft-olive)) !important;
+}
+
+a,
+.nav-link,
+.nav-label a {
+  color: var(--nb-text) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.nav-link:hover,
+.nav-label a:hover {
+  background: var(--nb-text) !important;
+  color: #ffffff !important;
+}
+
+.btn,
+button {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem !important;
+}
+
+.btn-primary {
+  background: var(--nb-primary) !important;
+  color: #0b1020 !important;
+}
+
+.btn-success {
+  background: var(--nb-success) !important;
+  color: #0b1020 !important;
+}
+
+.btn-warning {
+  background: var(--nb-warning) !important;
+  color: #111111 !important;
+}
+
+.btn-danger {
+  background: var(--nb-danger) !important;
+  color: #1f1a1a !important;
+}
+
+.card-title h3,
+.card-title h4,
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600 !important; /* Poppins SemiBold for headings */
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+p,
+li,
+td,
+th,
+label,
+input,
+textarea,
+button,
+.form-control {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+}
+
+small,
+.small,
+.text-muted,
+.caption {
+  font-weight: 300;
+  color: var(--nb-text-muted) !important;
+}
+
+.table th,
+.table td {
+  border-top: 2px solid var(--nb-border) !important;
+}
+
+input.form-control,
+textarea.form-control {
+  background: #f7f7f2 !important;
+  border-color: rgba(22, 22, 22, 0.4) !important;
+}
+
+.alert-success {
+  background: rgba(127, 191, 155, 0.18) !important;
+  color: var(--nb-text) !important;
+}
+
+.alert-danger {
+  background: rgba(230, 138, 138, 0.18) !important;
+  color: var(--nb-text) !important;
+}
+
+.page-titles {
+  border-bottom: 3px solid var(--nb-border) !important;
+}
+
+/* keep charts responsive but boxed */
+img.img-fluid {
+  border: 2px solid var(--nb-border);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Soft background tints for Bootstrap bg-* helpers */
+.bg-primary {
+  background-color: var(--nb-soft-blue) !important;
+  color: var(--nb-text) !important;
+}
+
+.bg-success {
+  background-color: var(--nb-soft-olive) !important;
+  color: var(--nb-text) !important;
+}
+
+.bg-warning {
+  background-color: var(--nb-warning) !important;
+  color: var(--nb-text) !important;
+}
+
+.bg-danger {
+  background-color: var(--nb-danger) !important;
+  color: var(--nb-text) !important;
+}

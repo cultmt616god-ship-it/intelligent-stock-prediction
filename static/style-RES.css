@@ -12,24 +12,6 @@
 @import url(helper.css);
 @import url(spinners.css);
 @import url(animate.css);
-<head>
-  <link rel="import" href="{{ url_for('static', filename='font-awesome.min.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='bootstrap-RES.min.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='simple-line-icons.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='weather-icons.min.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='linea.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='helper.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='spinners.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='animate.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='cryptocoins.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='cryptocoins-colors.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='themify-icons.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='flag-icon.min.css') }}">
-  <link rel="import" href="{{ url_for('static', filename='materialdesignicons.min.css)') }}">
-
-
-
-</head>
 /*
 Style   : CoinDash CSS
 Version : 1.0
@@ -1832,9 +1814,9 @@ textarea {
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-dasharray: 500%;
-    stroke-dasharray: 0 /;
+    stroke-dasharray: 0;
     /* fixes IE prob */
-    stroke-dashoffset: 0 /;
+    stroke-dashoffset: 0;
     /* fixes IE prob */
     -webkit-animation: am-draw 40s;
     animation: am-draw 40s;

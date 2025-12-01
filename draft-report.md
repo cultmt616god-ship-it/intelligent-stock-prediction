@@ -105,6 +105,10 @@ The project was planned in several phases, which can be represented using a Gant
 
 In the formatted report, this schedule can be drawn as a Gantt chart with tasks plotted against calendar weeks.
 
+![Project Gantt Chart](docs/diagrams/exported/project_gantt.png)
+
+Figure 5: Project Gantt Chart showing development phases and timeline
+
 
 4. PROJECT DESCRIPTION
 
@@ -209,6 +213,14 @@ Typical use‑cases:
 
 These can be represented in UML as use‑case diagrams and an E‑R diagram showing relationships between User, Company, Broker, PortfolioItem, Transaction, and Dividend.
 
+![ER Diagram](docs/diagrams/exported/er_diagram.png)
+
+Figure 1: Entity-Relationship Diagram of the Share Market Management System
+
+![Use Case Diagram](docs/diagrams/exported/usecase_diagram.png)
+
+Figure 2: Use Case Diagram of the Share Market Management System
+
 4.4.2 Data Flow Diagrams (DFD)
 
 At a high level (Level 0 DFD):
@@ -217,7 +229,15 @@ At a high level (Level 0 DFD):
 · Processes: Authentication, Portfolio Management, Prediction Engine, Sentiment Analysis, Admin Monitoring.
 · Data stores: User DB, Company DB, Portfolio DB, Transaction DB, Dividend DB.
 
+![DFD Level 0](docs/diagrams/exported/dfd_level0.png)
+
+Figure 3: Data Flow Diagram Level 0 - Overall System Architecture
+
 At Level 1, the Portfolio Management process expands into sub‑processes for Buy, Sell, and Dividend recording, each interacting with wallet balance and portfolio tables.
+
+![DFD Level 1](docs/diagrams/exported/dfd_portfolio_level1.png)
+
+Figure 4: Data Flow Diagram Level 1 - Portfolio Management Subprocesses
 
 4.4.3 Data Dictionary (Excerpt)
 

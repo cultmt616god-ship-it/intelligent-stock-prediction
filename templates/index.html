@@ -3,21 +3,24 @@
 
 <head>
   <meta charset="utf-8">
-  <title>JKS</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <title>JKS - Stock Market Prediction</title>
+  <meta name="description" content="Calm, Data-Driven Stock Forecasts">
+  <meta name="author" content="JKS">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- Favicons -->
   <link rel="shortcut icon" sizes="16x16" href="{{ url_for('static', filename='logo-2.png') }}" />
 
   <!-- Bootstrap -->
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min-RES.css') }}">
 
   <!-- Fonts -->
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='simple-line-icons.css') }}"
-    media="screen" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='simple-line-icons.css') }}" media="screen" />
   <link rel="stylesheet" href="{{ url_for('static', filename='et-line-font.css') }}">
 
   <!-- MENU CSS -->
@@ -27,183 +30,557 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style-RES.css') }}">
 
   <!-- Responsive -->
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='responsive.css') }}">
 
   <!-- Animate.min -->
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='animate.min.css') }}">
+  
+  <!-- Neubrutalist theme override -->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='neubrutalist.css') }}">
+  
+  <style>
+    /* Minggola Font Faces */
+    @font-face {
+        font-family: 'Minggola';
+        src: url('../fonts/minggola.ttf') format('truetype'),
+             url('../fonts/minggola.otf') format('opentype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Minggola';
+        src: url('../fonts/minggola-bold.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+    }
+    
+    /* Navigation Bar Fixes */
+    .navbar {
+      background: #fafafa !important;
+      border: none !important;
+      padding: 10px 0;
+    }
+    
+    .menuzord {
+      background: transparent !important;
+      padding: 0 30px;
+    }
+    
+    .menuzord-brand {
+      font-family: 'Minggola', sans-serif;
+      font-size: 28px;
+      font-weight: bold;
+      color: #181a1f;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      line-height: 40px;
+      margin-right: 20px; /* Add spacing between logo and menu */
+      padding-bottom: 10px;
+    }
+    
+    .menuzord-brand:hover {
+      color: #181a1f;
+      text-decoration: none;
+    }
+    
+    .menuzord-menu {
+      background: transparent !important;
+    }
+    
+    .menuzord-menu > li > a {
+      color: #181a1f !important;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 15px !important;
+      border-radius: 0;
+      transition: all 0.3s ease;
+    }
+    
+    /* Match the login page hover style */
+    .menuzord-menu > li > a:hover,
+    .menuzord-menu > li.active > a {
+      background: var(--nb-text) !important;
+      color: #ffffff !important;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #C9CFA7 0%, #A9DDF9 100%);
+      padding: 80px 0;
+      margin-bottom: 40px;
+      border-bottom: 3px solid #161616;
+    }
+    
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #181a1f;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.3;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      color: #181a1f;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    
+    .prediction-form {
+      background: #fdfdf8;
+      padding: 30px;
+      border-radius: 0;
+      border: 2px solid #161616;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+      max-width: 600px;
+      margin: 0 auto 60px;
+    }
+    
+    .form-title {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 1.5rem;
+    }
+    
+    .prediction-input {
+      margin-bottom: 20px;
+    }
+    
+    .prediction-input input {
+      height: 50px;
+      font-size: 1rem;
+      padding: 10px 15px;
+    }
+    
+    .prediction-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    
+    .features-section {
+      padding: 60px 0;
+      background: #f4f5f0;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 1.8rem;
+    }
+    
+    .feature-card {
+      background: #fdfdf8;
+      padding: 25px;
+      border-radius: 0;
+      border: 2px solid #161616;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+      height: 100%;
+      transition: transform 0.3s ease;
+      margin-bottom: 25px;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 15px;
+      color: #7fbadf;
+    }
+    
+    .feature-title {
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 1.3rem;
+    }
+    
+    .feature-description {
+      color: #6b7280;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    
+    .footer-section {
+      background: linear-gradient(135deg, #C9CFA7 0%, #A9DDF9 100%);
+      padding: 30px 0;
+      border-top: 3px solid #161616;
+      margin-top: 40px;
+      margin-bottom: 0px; /* Changed from 16px to 0px as requested */
+    }
+    
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: #7fbadf;
+      color: #0b1020;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      border: 2px solid #161616;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .back-to-top:hover {
+      background: #161616;
+      color: #ffffff;
+      transform: translateY(-3px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 991px) {
+      .hero-section {
+        padding: 60px 0;
+      }
+      
+      .hero-title {
+        font-size: 1.8rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .prediction-form {
+        padding: 25px;
+        margin-bottom: 50px;
+        border-radius: 0;
+      }
+      
+      .form-title {
+        font-size: 1.3rem;
+      }
+      
+      .features-section {
+        padding: 50px 0;
+      }
+      
+      .section-title {
+        font-size: 1.6rem;
+        margin-bottom: 30px;
+      }
+      
+      .menuzord-brand img {
+        height: 35px;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .hero-section {
+        padding: 50px 0;
+        margin-bottom: 30px;
+      }
+      
+      .hero-title {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+      }
+      
+      .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+      }
+      
+      .prediction-form {
+        padding: 20px;
+        margin-bottom: 40px;
+        border-radius: 0;
+      }
+      
+      .form-title {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
+      
+      .prediction-input input {
+        height: 45px;
+        font-size: 0.95rem;
+      }
+      
+      .prediction-btn {
+        font-size: 1rem;
+        padding: 10px;
+      }
+      
+      .features-section {
+        padding: 40px 0;
+      }
+      
+      .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 25px;
+      }
+      
+      .feature-card {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 0;
+      }
+      
+      .feature-icon {
+        font-size: 1.8rem;
+      }
+      
+      .feature-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+      
+      .feature-description {
+        font-size: 0.9rem;
+      }
+      
+      .footer-section {
+        padding: 25px 0;
+        margin-bottom: 0px; /* Ensure 0px margin on mobile as well */
+      }
+      
+      .back-to-top {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+        bottom: 15px;
+        right: 15px;
+      }
+      
+      .menuzord {
+        padding: 0 15px;
+      }
+    }
+    
+    @media (max-width: 575px) {
+      .hero-section {
+        padding: 40px 0;
+        margin-bottom: 25px;
+      }
+      
+      .hero-title {
+        font-size: 1.4rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .prediction-form {
+        padding: 15px;
+        margin-bottom: 35px;
+        border-radius: 0;
+      }
+      
+      .form-title {
+        font-size: 1.1rem;
+      }
+      
+      .section-title {
+        font-size: 1.2rem;
+      }
+      
+      .feature-icon {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+      }
+      
+      .feature-title {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="header-fix fix-sidebar">
 
   <!--preloader start-->
-
   <!--preloader end-->
 
   <!-- Nav Bar-->
-
-  <nav class="navbar-fixed-top transparrent-bg">
+  <nav class="navbar navbar-expand-lg navbar-fixed-top transparrent-bg" style="background-color: #fafafa; border: 1px solid transparent;">
     <div class="container">
-      <div id="menuzord" class="menuzord red"> <a href="{{ url_for('index') }}" class="menuzord-brand"><img
-            src="{{url_for('static', filename='logo-2.png')}}" />
-
+      <div id="menuzord" class="menuzord red menuzord-responsive"> 
+        <a href="{{ url_for('index') }}" class="menuzord-brand">
+          sams
         </a>
         <ul class="menuzord-menu mp_menu">
           <li class="active"><a href="{{ url_for('index') }}">HOME</a></li>
           <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
         </ul>
-
       </div>
     </div>
   </nav>
-
   <!-- END Nav Bar -->
 
-  <!-- Header -->
-  <div id="home" class="bg-inner low-back-gradient-inner">
-    <div class="text-con-inner low-back-up">
-      <div class="container">
-        <div style="padding-top: 40px" class="row">
-          <div class="lead col-lg-12 col-xm-12 text-center">
-            <h1><span class="top-heading-inner">PREDICT THE FUTURE</span> </h1>
-            <div class="list-o-i white">
-              <p class="white no-p"></p>
-              <div class="pagenation_links"><a href="index.html" class="yellow"><br></a><i> </i></div>
-            </div>
-          </div>
-        </div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Calm, Data-Driven Stock Forecasts</h1>
+        <p class="hero-subtitle">
+          Enter a stock symbol below to generate tomorrow's price forecasts and a sentiment overview
+          using ARIMA, LSTM, linear regression and recent news.
+        </p>
       </div>
+    </div>
+  </section>
+  <!-- End Hero Section -->
+
+  <!-- Prediction Form -->
+  <div class="container">
+    <div class="prediction-form">
+      <h2 class="form-title">Please Enter a Stock Symbol</h2>
+      <form class="login" action="{{ url_for('predict') }}" method="POST">
+        {% if not_found %}
+        <div class="alert alert-danger" role="alert">
+          Stock Symbol (Ticker) Not Found. Please Enter a Valid Stock Symbol
+        </div>
+        {% endif %}
+        <div class="prediction-input">
+          <input type="text" class="form-control" name="nm" placeholder="Company Stock Symbol (e.g. AAPL, GOOGL)" required>
+        </div>
+        <div class="prediction-input">
+          <button class="btn btn-primary prediction-btn" type="submit">View Forecast</button>
+        </div>
+      </form>
     </div>
   </div>
-  <!-- ENd Header -->
+  <!-- End Prediction Form -->
 
-  <!-- Login  -->
-  <div class="login_page login_solid_bg">
+  <!-- Features Section -->
+  <section class="features-section">
     <div class="container">
-      <div class="log_in_logo text-center"> <img style="height: 250px" src="{{url_for('static', filename='tile7.png')}}"
+      <h2 class="section-title">Our Features</h2>
+      <div class="row">
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fa fa-line-chart"></i>
+            </div>
+            <h3 class="feature-title">Advanced ML Models</h3>
+            <p class="feature-description">
+              Utilize ARIMA, LSTM, and Linear Regression algorithms to predict future stock prices with high accuracy.
+            </p>
           </div>
-        <div class="log_in_box">
-          <form class="login" action="{{ url_for('predict') }}" method="POST">
-            <div class="login_title">
-              <h2>PLEASE ENTER A STOCK SYMBOL</h2>{% if not_found %}
-              <div class="alert alert-danger" style="color: red;" role="alert">
-                Stock Symbol (Ticker) Not Found. Please Enter a Valid Stock Symbol
-              </div>
-              {% endif %}
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fa fa-newspaper-o"></i>
             </div>
-            <div class="form-group">
-              <input type="text" class="form-control" name="nm" placeholder="Company Stock Symbol">
-
+            <h3 class="feature-title">Sentiment Analysis</h3>
+            <p class="feature-description">
+              Analyze recent news and social media sentiment to understand market mood and its impact on stock prices.
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fa fa-shield"></i>
             </div>
-            <div class="form-group">
-
-            </div>
-            <div class="form-group">
-              <button class="btn btn-login">PREDICT THE FUTURE</button>
-            </div>
-
-          </form>
+            <h3 class="feature-title">Secure & Reliable</h3>
+            <p class="feature-description">
+              Built with security in mind, ensuring your data is protected while providing accurate predictions.
+            </p>
+          </div>
         </div>
       </div>
     </div>
-    <!-- End Lgin  -->
+  </section>
+  <!-- End Features Section -->
 
-    <!-- Demo Heading -->
-
-    <div class="main-area top-download text-center ">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8">
-            <p class="top-btn-text"> </p>
-          </div>
-          <div class="col-md-4 btn-ma"> </div>
+  <!-- Footer -->
+  <footer class="footer-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p>&copy; 2025 JKS Wealth Management. All rights reserved.</p>
         </div>
       </div>
     </div>
+  </footer>
+  <!-- End Footer -->
 
-    <!-- END Demo Heading -->
+  <!-- Back to Top -->
+  <a href="#" class="back-to-top" id="back-to-top" title="Back to top">
+    <i class="fa fa-arrow-up"></i>
+  </a>
 
+  <!-- js file  -->
+  <script type="text/javascript" src="{{url_for('static', filename='jquery-RES.min.js')}}"></script>
 
-    <!--Contact Popup-->
+  <!-- Bootstrap JS  -->
+  <script type="text/javascript" src="{{url_for('static', filename='bootstrap-RES.min.js')}}"></script>
 
-    <div class="modal fade pop-box" id="donate-popup" tabindex="-1" role="dialog" aria-labelledby="donate-popup"
-      aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <!--Donation div-->
-          <div class="donation-div">
-            <div class="donation-plz">
-              <form method="post" action="contact.html">
+  <!-- Menu JS  -->
+  <script type="text/javascript" src="{{url_for('static', filename='menuzord.js')}}"></script>
 
-                <!--Form Portlet-->
+  <!-- Owl Carousel -->
+  <script type="text/javascript" src="{{url_for('static', filename='owl.carousel.min.js')}}"></script>
 
-                <!--Form Portlet-->
-                <div class="form-portlet">
-                  <h4>Consultaion Information</h4>
-                  <div class="row clearfix">
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">First Name <span class="required">*</span></div>
-                      <input type="text" name="name" value="" placeholder="First Name" required>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">Last Name <span class="required">*</span></div>
-                      <input type="text" name="name" value="" placeholder="Last Name" required>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">Email <span class="required">*</span></div>
-                      <input type="email" name="name" value="" placeholder="Email" required>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">Phone <span class="required">*</span></div>
-                      <input type="text" name="name" value="" placeholder="Phone" required>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">Address 1 <span class="required">*</span></div>
-                      <input type="text" name="name" value="" placeholder="Address 1" required>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-6 col-xs-12">
-                      <div class="field-label">Address 2 <span class="required">*</span></div>
-                      <input type="text" name="name" value="" placeholder="Address 2" required>
-                    </div>
-                  </div>
-                </div>
-                <br>
-
-                <!--Form Portlet-->
-
-                <div class="text-left">
-                  <button type="submit" class="theme-btn btn-style-two">Send Now</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-
-    <!-- END Donate Popup-->
-
-    <!-- Back to Top -->
-    <a href="#" id="back-to-top" title="Back to top"><img src="{{url_for('static', filename='top-arrow.png')}}" </a>
-
-      <!-- js file  -->
-      <script type="text/javascript" src="{{url_for('static', filename='jquery.min.js')}}"></script>
-
-      <!-- Bootstrap JS  -->
-      <script type="text/javascript" src="{{url_for('static', filename='bootstrap.js')}}"></script>
-
-      <!-- Menu JS  -->
-      <script type="text/javascript" src="{{url_for('static', filename='menuzord.js')}}"></script>
-
-      <!-- Owl Carousel -->
-      <script type="text/javascript" src="{{url_for('static', filename='owl.carousel.min.js')}}"></script>
-
-      <!-- main js -->
-      <script type="text/javascript" src="{{url_for('static', filename='main.js')}}"></script>
+  <!-- main js -->
+  <script type="text/javascript" src="{{url_for('static', filename='main.js')}}"></script>
+  
+  <script>
+    // Back to top button functionality
+    $(document).ready(function(){
+      $(window).scroll(function(){
+        if ($(this).scrollTop() > 100) {
+          $('#back-to-top').addClass('show');
+        } else {
+          $('#back-to-top').removeClass('show');
+        }
+      });
+      
+      $('#back-to-top').click(function(){
+        $('html, body').animate({scrollTop : 0},800);
+        return false;
+      });
+      
+      // Ensure responsive images
+      $('img').addClass('img-fluid');
+    });
+  </script>
 </body>
 
 </html>
