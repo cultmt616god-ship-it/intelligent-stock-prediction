@@ -2,7 +2,7 @@ ABSTRACT
 
 The financial market generates a massive volume of data every second, making it difficult for individual investors to analyze and make timely decisions. Existing tools either track prices or offer basic trading, but they rarely combine intelligent forecasting with integrated portfolio management in a single, user‑friendly platform.
 
-This project presents a Share Market Management and Prediction System that integrates customer profiles, stock data, and predictive analytics into one full‑stack web application. The system provides simulated buy/sell transactions, fund and dividend tracking, broker commission management, and an admin monitoring dashboard. On the prediction side, an LSTM‑based model (with classical ARIMA and Linear Regression baselines) forecasts future stock trends using historical prices, while a sentiment analysis module aggregates news sentiment to give additional context. The backend is implemented in Python using Flask, with a SQLite database and responsive web interfaces.
+This project presents a Share Market Management and Prediction System that integrates customer profiles, stock data, and predictive analytics into one full‑stack web application. The system provides simulated buy/sell transactions, fund and dividend tracking, broker commission management, and an admin monitoring dashboard. On the prediction side, an LSTM‑based model (with classical ARIMA and Linear Regression baselines) forecasts future stock trends using historical prices, while a sentiment analysis module aggregates recent financial‑news sentiment to give additional context. The backend is implemented in Python using Flask, with a SQLite database and responsive web interfaces, and the prediction outputs are visualised through interactive D3‑based charts and summary widgets on the results page.
 
 The proposed system is intended for students, researchers, and amateur investors who wish to explore stock prediction and portfolio management in a safe, simulated environment. It closes gaps in the literature by embedding forecasting models into an end‑to‑end management workflow with explainable dashboards rather than providing prediction in isolation.
 
@@ -50,7 +50,7 @@ The project methodology can be summarized as follows:
   – Baseline models: Linear Regression and ARIMA to provide interpretable and classical benchmarks.
   – Deep learning model: A stacked LSTM network with dropout, trained on sliding windows of historical closing prices.
 
-· Sentiment Analysis: Aggregate news articles and headlines for a given stock, compute sentiment scores using tools such as VADER, and summarize polarity (positive/negative/neutral) over a recent time window.
+· Sentiment Analysis: Aggregate news articles and headlines for a given stock from free web sources (e.g., Finviz) and compute sentiment scores using tools such as VADER/TextBlob/FinVADER. Summarize polarity (positive/negative/neutral) over a recent time window and feed this into the final recommendation.
 
 · System Design: Architect a three‑tier web application using Flask (backend), HTML/CSS/Bootstrap (frontend), and SQLite (database) for persistence. Define the database schema for users, companies, portfolio items, transactions, brokers, and dividends.
 
@@ -184,7 +184,7 @@ The system follows a three‑tier architecture:
 
 · Login and Registration Pages: Allow users to register, log in, and access the dashboard.
 · User Dashboard: Displays wallet balance, invested amount, current portfolio value, unrealised P/L, holdings table, trade forms, dividend form, and recent transactions.
-· Prediction Results Page: Shows selected stock information, price history, prediction curves, and sentiment charts.
+· Prediction Results Page: Shows selected stock information, price history, interactive D3‑based accuracy charts for ARIMA/LSTM/Linear Regression (actual vs. predicted), per‑model RMSE metrics, a seven‑day forecast table, sentiment charts, an external link to the corresponding Yahoo Finance quote page, and a textual recommendation that combines model outputs with aggregated sentiment.
 · Admin Dashboard: Presents statistics (users, companies, brokers, transactions, commission, volume), broker management forms, and company management tools.
 
 The UI is implemented with Bootstrap for responsiveness and follows a consistent colour theme across pages.
@@ -294,7 +294,7 @@ At this stage, the system focuses on providing a complete and robust pipeline fr
 
 · Functional Validation: Test scenarios confirm that user registration, login, wallet updates, buy/sell trades, dividend recording, and admin monitoring all work as expected on test data.
 
-· Qualitative Prediction Assessment: The LSTM and baseline models produce plausible next‑day predictions on historical price series, and sentiment scores vary sensibly with positive and negative news headlines. Logs and debug hooks confirm that sentiment distributions are correctly computed.
+· Qualitative Prediction Assessment: The LSTM and baseline models produce plausible next‑day predictions on historical price series, and sentiment scores vary sensibly with positive and negative news headlines. Logs and debug hooks confirm that sentiment distributions are correctly computed, and the interactive accuracy charts (actual vs. predicted curves with optional Voronoi overlays) make it easier to visually inspect where each model over‑ or under‑shoots the true prices.
 
 · Usability: The dashboard layout and forms follow a consistent Bootstrap‑based theme, and key actions (buy, sell, predict, record dividend) are accessible from the main screens.
 
