@@ -15,14 +15,16 @@
 ![GitHub stars](https://img.shields.io/github/stars/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis?style=social)
 
-# Stock-Market-Prediction-Web-App-using-Machine-Learning
-**Stock Market Prediction** Web App based on **Machine Learning** and **Sentiment Analysis** of Tweets **(API keys included in code)**. The front end of the Web App is based on **Flask** and **Wordpress**. The App forecasts stock prices of the next seven days for any given stock under **NASDAQ** or **NSE** as input by the user. Predictions are made using three algorithms: **ARIMA, LSTM, Linear Regression**. The Web App combines the predicted prices of the next seven days with the **sentiment analysis of tweets** to give recommendation whether the price is going to rise or fall.
+# Stock Analysis & Market Sentiment System
+
+A full-stack web application that combines machine learning-based stock price prediction with sentiment analysis of financial news and integrated portfolio management. This system provides a simulated trading environment where users can experiment with stock predictions and portfolio strategies in a risk-free setting.
 
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#system-description-and-functions">System Description and Functions</a></li>
+    <li><a href="#project-overview">Project Overview</a></li>
+    <li><a href="#key-features">Key Features</a></li>
     <li><a href="#built-with">Built With</a></li>
     <li><a href="#installation">Installation</a></li>
     <li><a href="#authors">Authors</a></li>
@@ -30,91 +32,127 @@
   </ol>
 </details>
 
-## System Description and Functions
-**Demo Video:** <br/>
-[<img src="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/blob/master/screenshots/banner.png">](https://www.youtube.com/watch?v=xnq7mBdJAJk "Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis")<br/><br/>
-**Screenshots:** <br/>
-<img src="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/blob/master/screenshots/banner.png">
-<img src="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/blob/master/screenshots/banner2.PNG">
-<img src="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/blob/master/screenshots/11-resuts.png" width="750">
-<img src="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/blob/master/screenshots/wp-admin.PNG" width="750">
+## Project Overview
 
-**Admin Creds:** <br/>
-Username: admin <br/>
-Email Address: stockpredictorapp@gmail.com <br/>
-Password: Samplepass@123 <br/>
+This project presents a Stock Analysis & Market Sentiment system that integrates customer profiles, stock data, and predictive analytics into one full-stack web application. The system provides simulated buy/sell transactions, fund and dividend tracking, broker commission management, and an admin monitoring dashboard.
 
-There are two roles in the system: **Admin** and **User**.<br/><br/>
-Users can:<br/>
-<ol>
-    <li>Register and Login </li>
-    <li>Check Real Time stock prices</li>
-    <li>Read recent news about different stocks</li>
-    <li>Currency Converter</li>
-    <li>Edit or delete their own profile</li>
-    <li>Educate the user about stocks</li>
-    <li>Download list of stock tickers</li>
-    <li>Predict Stock prices for the next 7 days for all NASDAQ and NSE stocks</li>
-</ol>
+On the prediction side, an LSTM-based model (with classical ARIMA and Linear Regression baselines) forecasts future stock trends using historical prices, while a sentiment analysis module aggregates recent financial-news sentiment to give additional context. The backend is implemented in Python using Flask, with a SQLite database and responsive web interfaces, and the prediction outputs are visualised through interactive D3-based charts and summary widgets on the results page.
 
-Admin can:<br/>
-<ol>
-    <li>Create, Retrieve, Update Delete Users.</li>
-    <li>Manually trigger emails.</li>
-    <li>Register and Login </li>
-    <li>Check Real Time stock prices</li>
-    <li>Read recent news about different stocks</li>
-    <li>Currency Converter</li>
-    <li>Edit or delete their own profile</li>
-    <li>Educate the user about stocks</li>
-    <li>Download list of stock tickers</li>
-    <li>Predict Stock prices for the next 7 days for all NASDAQ and NSE stocks</li>
-</ol>
+The proposed system is intended for students, researchers, and amateur investors who wish to explore stock prediction and portfolio management in a safe, simulated environment. It closes gaps in the literature by embedding forecasting models into an end-to-end management workflow with explainable dashboards rather than providing prediction in isolation.
+
+## Key Features
+
+### Portfolio Management
+- User registration and authentication with role-based access control
+- Virtual wallet and fund tracking for simulated trading
+- Stock buy/sell operations with commission calculations
+- Dividend recording and tracking
+- Portfolio holdings visualization and performance metrics
+
+### Prediction Engine
+- LSTM neural network for stock price prediction
+- Classical baseline models (ARIMA, Linear Regression)
+- Financial news sentiment analysis using multiple sources
+- Interactive visualization of prediction accuracy
+- Seven-day forward price forecasting
+
+### Administration
+- User and company management
+- Broker configuration with commission rates
+- Transaction monitoring and reporting
+- System statistics dashboard
 
 ## Built With
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
-![django](https://img.shields.io/badge/Django-20232A?style=for-the-badge&logo=django&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![nodejs](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![react](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![html](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![css](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![jquery](https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white)
-![wordpress](https://img.shields.io/badge/Wordpress-006699?style=for-the-badge&logo=wordpress&logoColor=white)
 ![Keras](https://img.shields.io/badge/Keras-red?style=for-the-badge&logo=keras&logoColor=white)
 ![Numpy](https://img.shields.io/badge/Numpy-blue?style=for-the-badge&logo=numpy&logoColor=white)
 ![pandas](https://img.shields.io/badge/Pandas-green?style=for-the-badge&logo=pandas&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
+![Scikit Learn](https://img.shields.io/badge/Scikit_Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
 ## Installation
-1. Install XAMPP server
-2. Download wordpress zip folder from <a href="https://drive.google.com/file/d/1J753gY0Nv6HGSkPngSxrogNghDQnoIlk/view?usp=sharing">this link</a>.
-3. Extract the downloaded zip into ```htdocs``` folder of XAMPP.
-4. Open the ```wp-config.php``` file from the extracted folder and add your phpmyadmin username and password.
-5. Go to phpmyadmin, create a new database called ```wordpress```.
-6. Select this database, go to Operations tab and Import the ```wordpress.sql``` file into this created databse.
-7. Clone the repo, cd into it
-4. Run ```pip install -r requirements.txt```
-5. Run ```python main.py``` to start server.
-7. Go to ```localhost/wordpress``` to access the app.
 
-Find more screenshots in the <b>screenshots folder</b> Or <a href="https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis/tree/master/screenshots">click here</a>
+### Prerequisites
+- Python 3.7+
+- pip package manager
 
+### Setup Instructions
+
+1. Clone the repository:
+```bash
+git clone https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis.git
+cd Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis
+```
+
+2. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the application:
+```bash
+python main.py
+```
+
+5. Access the application at `http://localhost:5000`
+
+### Default Credentials
+- **Admin User**: 
+  - Username: admin
+  - Email: stockpredictorapp@gmail.com
+  - Password: Samplepass@123
 
 ## Authors
-### Kaushik Jadhav
+
+### Current Maintainer
+This project is now maintained as an open-source educational tool.
+
+### Original Developer
+#### Kaushik Jadhav
+
+If you use this software in your research, please cite it as:
+
+**APA Format:**
+Jadhav, K. (2023). Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis (Version 2.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10498988
+
+**BibTeX:**
+```
+@software{Jadhav_Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis_2023,
+author = {Jadhav, Kaushik},
+doi = {10.5281/zenodo.10498988},
+month = mar,
+title = Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis,
+url = {https://github.com/kaushikjadhav01/Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis},
+version = {2.0.0},
+year = {2023}
+}
+```
+
 <ul>
 <li>Github: https://github.com/kaushikjadhav01</li>
 <li>Medium: https://medium.com/@kaushikjadhav01</li>
 <li>LinkedIn: https://www.linkedin.com/in/kaushikjadhav01/</li>
 <li>Portfolio: http://kajadhav.me/</li>
-<li>Linked In: https://www.linkedin.com/in/kajadhav/
-<li>Dev.to: https://dev.to/kaushikjadhav01
-<li>Codesignal: https://app.codesignal.com/profile/kaushik_j_vtc
-<li>Google Scholar: https://scholar.google.com/citations?user=iRYcFi0AAAAJ
-<li>Daily.dev: https://app.daily.dev/kaushikjadhav01
-<li>Google devs: https://developers.google.com/profile/u/kaushikjadhav01
-<li>Stack Overflow: https://stackoverflow.com/users/21890981/kaushik-jadhav
+<li>LinkedIn: https://www.linkedin.com/in/kajadhav/</li>
+<li>Dev.to: https://dev.to/kaushikjadhav01</li>
+<li>Codesignal: https://app.codesignal.com/profile/kaushik_j_vtc</li>
+<li>Google Scholar: https://scholar.google.com/citations?user=iRYcFi0AAAAJ</li>
+<li>Daily.dev: https://app.daily.dev/kaushikjadhav01</li>
+<li>Google devs: https://developers.google.com/profile/u/kaushikjadhav01</li>
+<li>Stack Overflow: https://stackoverflow.com/users/21890981/kaushik-jadhav</li>
 </ul>
 
 ## Links

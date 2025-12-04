@@ -329,4 +329,6 @@ Future enhancements include:
 
 [6] Journal of Big Data, 2025, VMD–TMFG–LSTM feature decomposition for improved stock prediction accuracy.
 
+[7] Jadhav, K., 2023. Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis (Version 2.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10498988
+
 In the final Word document, these references can be expanded with full bibliographic details (titles, journal or conference names, volume, issue, pages) in standard IEEE style.
