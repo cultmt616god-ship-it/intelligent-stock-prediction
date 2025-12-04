@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>JKS - Register</title>
+    <title>SAMS - Register</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-2.png') }}">
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,8 +65,8 @@
                 <h3 class="text-primary">Create a new account</h3>
             </div>
         </div>
-        <div class="container-fluid" style="height: calc(100vh - 100px); display: flex; align-items: flex-end;">
-            <div class="row justify-content-center" style="width: 100%; margin-bottom: 50px;">
+        <div class="container-fluid" style="min-height: calc(100vh - 100px); display: flex; align-items: center; padding-bottom: 0;">
+            <div class="row justify-content-center" style="width: 100%;">
                 <div class="col-12 col-md-6 col-lg-4">
                     {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
