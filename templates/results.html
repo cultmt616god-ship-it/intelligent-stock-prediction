@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-2.png') }}">
-    <title>JKS</title>
+    <title>SAMS</title>
 
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -158,7 +158,14 @@
                             <h4>ARIMA model accuracy</h4>
                         </div>
                         <div class="sales-chart text-center">
-                            <img class="img-fluid" src="{{url_for('static', filename='ARIMA.png')}}" alt="ARIMA Accuracy">
+                            <!-- Replace static image with D3 chart -->
+                            <div id="arima-chart-container">
+                                <div id="arima-controls" style="margin-bottom: 10px; text-align: center;">
+                                    <label for="arima-voronoi">Show voronoi:</label>
+                                    <input type="checkbox" id="arima-voronoi">
+                                </div>
+                                <div id="arima-chart" style="width: 100%; height: 400px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -168,7 +175,14 @@
                             <h4>LSTM model accuracy</h4>
                         </div>
                         <div class="team-chart text-center">
-                            <img class="img-fluid" src="{{url_for('static', filename='LSTM.png')}}" alt="LSTM Accuracy">
+                            <!-- Replace static image with D3 chart -->
+                            <div id="lstm-chart-container">
+                                <div id="lstm-controls" style="margin-bottom: 10px; text-align: center;">
+                                    <label for="lstm-voronoi">Show voronoi:</label>
+                                    <input type="checkbox" id="lstm-voronoi">
+                                </div>
+                                <div id="lstm-chart" style="width: 100%; height: 400px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -178,7 +192,14 @@
                             <h4>Linear regression accuracy</h4>
                         </div>
                         <div class="team-chart text-center">
-                            <img class="img-fluid" src="{{url_for('static', filename='LR.png')}}" alt="LR Accuracy">
+                            <!-- Replace static image with D3 chart -->
+                            <div id="lr-chart-container">
+                                <div id="lr-controls" style="margin-bottom: 10px; text-align: center;">
+                                    <label for="lr-voronoi">Show voronoi:</label>
+                                    <input type="checkbox" id="lr-voronoi">
+                                </div>
+                                <div id="lr-chart" style="width: 100%; height: 400px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -282,7 +303,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th></th>
                                             <th>Posts</th>
                                             <th></th>
                                             <th></th>
@@ -291,7 +312,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>#</td>
+                                            <td></td>
                                             <td>
                                                 {% for i in range(0,12) %}
                                                 {{sentiment_list[i]}}<br>
@@ -328,7 +349,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th></th>
                                             <th>Close</th>
                                             <th></th>
                                             <th></th>
@@ -338,11 +359,17 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <div class="text-center">
-                                                    <a href="https://finance.yahoo.com/quote/{{quote}}"><img
-                                                            class="img-fluid"
-                                                            style="padding: 0;width:120px;height: 120px;"
-                                                            src="{{url_for('static', filename='fore.png')}}" alt=""></a>
+                                                <div class="yahoo-link-wrapper">
+                                                    <a href="https://finance.yahoo.com/quote/{{quote}}"
+                                                       target="_blank"
+                                                       rel="noopener"
+                                                       class="btn-yahoo-link">
+                                                        <span class="btn-yahoo-label">View on Yahoo Finance</span>
+                                                        <span class="btn-yahoo-icon">↗</span>
+                                                    </a>
+                                                    <div class="yahoo-link-subtitle">
+                                                        Open the full quote, chart, and fundamentals.
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td>
@@ -432,7 +459,459 @@
 <!--Custom JavaScript -->
 <script src="{{url_for('static', filename='custom.min.js')}}"></script>
 
+<!-- Add D3.js library and chart initialization scripts -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    // Function to create a multi-line chart with voronoi toggle
+    function createMultiLineChart(containerId, actualData, predictedData, title, voronoiToggleId) {
+        // Set dimensions and margins
+        const margin = {top: 20, right: 30, bottom: 50, left: 60};
+        const width = document.getElementById(containerId).clientWidth - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        // Clear previous chart
+        d3.select("#" + containerId).selectAll("*").remove();
+
+        // Create SVG
+        const svg = d3.select("#" + containerId)
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
+            .attr("style", "max-width: 100%; height: auto; overflow: visible; font: 10px sans-serif;")
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Prepare data
+        const actualPoints = actualData.map((d, i) => ({index: i, value: d, type: "Actual"}));
+        const predictedPoints = predictedData.map((d, i) => ({index: i, value: d, type: "Predicted"}));
+        const allData = [...actualPoints, ...predictedPoints];
+        
+        // Get min/max values for axes
+        const xMin = d3.min(allData, d => d.index);
+        const xMax = d3.max(allData, d => d.index);
+        const yMin = d3.min(allData, d => d.value);
+        const yMax = d3.max(allData, d => d.value);
+        
+        // Add padding to y-axis
+        const yPadding = (yMax - yMin) * 0.1;
+        
+        // Create scales
+        const xScale = d3.scaleLinear()
+            .domain([xMin, xMax])
+            .range([0, width]);
+            
+        const yScale = d3.scaleLinear()
+            .domain([yMin - yPadding, yMax + yPadding])
+            .range([height, 0]);
+
+        // Create line generators
+        const actualLine = d3.line()
+            .x(d => xScale(d.index))
+            .y(d => yScale(d.value))
+            .curve(d3.curveMonotoneX);
+            
+        const predictedLine = d3.line()
+            .x(d => xScale(d.index))
+            .y(d => yScale(d.value))
+            .curve(d3.curveMonotoneX);
+
+        // Add X axis
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale).ticks(width / 80).tickSizeOuter(0))
+            .selectAll("text")
+            .style("font-size", "12px");
+
+        // Add Y axis
+        svg.append("g")
+            .call(d3.axisLeft(yScale))
+            .call(g => g.select(".domain").remove())
+            .call(g => g.selectAll(".tick line").clone()
+                .attr("x2", width)
+                .attr("stroke-opacity", 0.1))
+            .selectAll("text")
+            .style("font-size", "12px");
+
+        // Add grid lines
+        svg.append("g")
+            .attr("class", "grid")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale)
+                .tickSize(-height)
+                .tickFormat("")
+            )
+            .selectAll("line")
+            .attr("stroke", "#eee")
+            .attr("stroke-dasharray", "2,2");
+
+        svg.append("g")
+            .attr("class", "grid")
+            .call(d3.axisLeft(yScale)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+            .selectAll("line")
+            .attr("stroke", "#eee")
+            .attr("stroke-dasharray", "2,2");
+
+        // Add X axis label
+        svg.append("text")
+            .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
+            .style("text-anchor", "middle")
+            .style("font-size", "14px")
+            .text("Time Period");
+
+        // Add Y axis label
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-size", "14px")
+            .text("Price ($)");
+
+        // Compute the points in pixel space as [x, y, z], where z is the name of the series.
+        const points = [];
+        actualPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type]));
+        predictedPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type]));
+
+        // Add Voronoi overlay if checkbox is checked
+        const voronoiCheckbox = document.getElementById(voronoiToggleId);
+        if (voronoiCheckbox && voronoiCheckbox.checked) {
+            svg.append("path")
+                .attr("fill", "none")
+                .attr("stroke", "#ccc")
+                .attr("d", d3.Delaunay
+                    .from(points)
+                    .voronoi([0, 0, width, height])
+                    .render());
+        }
+
+        // Add the actual line
+        svg.append("path")
+            .datum(actualPoints)
+            .attr("fill", "none")
+            .attr("stroke", "#1F77B4")
+            .attr("stroke-width", 2)
+            .attr("stroke-dasharray", "5,5") // Dotted line for actual
+            .attr("d", actualLine);
+
+        // Add the predicted line
+        svg.append("path")
+            .datum(predictedPoints)
+            .attr("fill", "none")
+            .attr("stroke", "#4B73B1")
+            .attr("stroke-width", 2)
+            .attr("d", predictedLine);
+
+        // Add circles for data points on actual line
+        svg.selectAll(".actual-point")
+            .data(actualPoints)
+            .enter().append("circle")
+            .attr("class", "actual-point")
+            .attr("cx", d => xScale(d.index))
+            .attr("cy", d => yScale(d.value))
+            .attr("r", 3)
+            .attr("fill", "#1F77B4")
+            .on("mouseover", function(event, d) {
+                d3.select(this).attr("r", 5);
+                // Add tooltip
+                const tooltip = d3.select("#" + containerId).append("div")
+                    .attr("class", "tooltip")
+                    .style("position", "absolute")
+                    .style("background", "rgba(0, 0, 0, 0.8)")
+                    .style("color", "white")
+                    .style("padding", "5px")
+                    .style("border-radius", "3px")
+                    .style("font-size", "12px")
+                    .style("pointer-events", "none")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px")
+                    .html(`Actual: ${d.value.toFixed(2)}<br/>Period: ${d.index}`);
+                    
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+            })
+            .on("mouseout", function() {
+                d3.select(this).attr("r", 3);
+                // Remove tooltip
+                d3.selectAll(".tooltip").remove();
+            });
+
+        // Add circles for data points on predicted line
+        svg.selectAll(".predicted-point")
+            .data(predictedPoints)
+            .enter().append("circle")
+            .attr("class", "predicted-point")
+            .attr("cx", d => xScale(d.index))
+            .attr("cy", d => yScale(d.value))
+            .attr("r", 3)
+            .attr("fill", "#4B73B1")
+            .on("mouseover", function(event, d) {
+                d3.select(this).attr("r", 5);
+                // Add tooltip
+                const tooltip = d3.select("#" + containerId).append("div")
+                    .attr("class", "tooltip")
+                    .style("position", "absolute")
+                    .style("background", "rgba(0, 0, 0, 0.8)")
+                    .style("color", "white")
+                    .style("padding", "5px")
+                    .style("border-radius", "3px")
+                    .style("font-size", "12px")
+                    .style("pointer-events", "none")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px")
+                    .html(`Predicted: ${d.value.toFixed(2)}<br/>Period: ${d.index}`);
+                    
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+            })
+            .on("mouseout", function() {
+                d3.select(this).attr("r", 3);
+                // Remove tooltip
+                d3.selectAll(".tooltip").remove();
+            });
+
+        // Add legend
+        const legend = svg.append("g")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 12)
+            .attr("text-anchor", "start")
+            .attr("transform", `translate(${width - 120}, 20)`);
+            
+        legend.append("rect")
+            .attr("x", 0)
+            .attr("width", 120)
+            .attr("height", 50)
+            .attr("fill", "white")
+            .attr("stroke", "#ccc")
+            .attr("stroke-width", 0.5);
+            
+        legend.append("line")
+            .attr("x1", 10)
+            .attr("y1", 15)
+            .attr("x2", 30)
+            .attr("y2", 15)
+            .attr("stroke", "#1F77B4")
+            .attr("stroke-width", 2)
+            .attr("stroke-dasharray", "5,5");
+            
+        legend.append("text")
+            .attr("x", 35)
+            .attr("y", 20)
+            .text("Actual Price");
+            
+        legend.append("line")
+            .attr("x1", 10)
+            .attr("y1", 35)
+            .attr("x2", 30)
+            .attr("y2", 35)
+            .attr("stroke", "#4B73B1")
+            .attr("stroke-width", 2);
+            
+        legend.append("text")
+            .attr("x", 35)
+            .attr("y", 40)
+            .text("Predicted Price");
+
+        // Add title
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("font-weight", "bold")
+            .text(title);
+            
+        // Add interactive tip
+        const focus = svg.append("g")
+            .attr("display", "none");
+            
+        focus.append("circle")
+            .attr("r", 2.5);
+            
+        focus.append("text")
+            .attr("text-anchor", "middle")
+            .attr("y", -8);
+            
+        // Add event listeners for interactivity
+        svg.on("pointerenter", () => pointerentered(svg, points, actualPoints, predictedPoints, focus, xScale, yScale))
+           .on("pointermove", (event) => pointermoved(event, svg, points, actualPoints, predictedPoints, focus, xScale, yScale))
+           .on("pointerleave", () => pointerleft(svg, focus));
+    }
+
+    // When the pointer moves, find the closest point, update the interactive tip, and highlight
+    // the corresponding line.
+    function pointermoved(event, svg, points, actualPoints, predictedPoints, focus, xScale, yScale) {
+        const [xm, ym] = d3.pointer(event);
+        const i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
+        const [x, y, k] = points[i];
+        
+        // Highlight the corresponding line
+        const path = svg.selectAll("path");
+        path.style("stroke", (d) => {
+            if (d && d[0] && d[0].type === k) return null;
+            return "#ddd";
+        }).filter((d) => d && d[0] && d[0].type === k).raise();
+        
+        focus.attr("transform", `translate(${x},${y})`);
+        focus.select("text").text(k);
+        
+        // Dispatch input event (optional)
+        svg.node().value = points[i];
+        svg.dispatch("input", {bubbles: true});
+    }
+
+    function pointerentered(svg, points, actualPoints, predictedPoints, focus) {
+        const path = svg.selectAll("path");
+        path.style("mix-blend-mode", null).style("stroke", "#ddd");
+        focus.attr("display", null);
+    }
+
+    function pointerleft(svg, focus) {
+        const path = svg.selectAll("path");
+        path.style("mix-blend-mode", "multiply").style("stroke", null);
+        focus.attr("display", "none");
+        svg.node().value = null;
+        svg.dispatch("input", {bubbles: true});
+    }
+
+    // Initialize charts when the page loads
+    document.addEventListener("DOMContentLoaded", function() {
+        // Parse the data from Jinja2 template
+        var arimaActual = JSON.parse('{{ arima_actual | tojson }}');
+        var arimaPredicted = JSON.parse('{{ arima_predicted | tojson }}');
+        createMultiLineChart("arima-chart", arimaActual, arimaPredicted, "ARIMA Model: Actual vs Predicted", "arima-voronoi");
+        
+        // LSTM Chart
+        var lstmActual = JSON.parse('{{ lstm_actual | tojson }}');
+        var lstmPredicted = JSON.parse('{{ lstm_predicted | tojson }}');
+        createMultiLineChart("lstm-chart", lstmActual, lstmPredicted, "LSTM Model: Actual vs Predicted", "lstm-voronoi");
+        
+        // Linear Regression Chart
+        var lrActual = JSON.parse('{{ lr_actual | tojson }}');
+        var lrPredicted = JSON.parse('{{ lr_predicted | tojson }}');
+        createMultiLineChart("lr-chart", lrActual, lrPredicted, "Linear Regression Model: Actual vs Predicted", "lr-voronoi");
+        
+        // Add event listeners to voronoi checkboxes
+        document.getElementById("arima-voronoi").addEventListener("change", function() {
+            var arimaActual = JSON.parse('{{ arima_actual | tojson }}');
+            var arimaPredicted = JSON.parse('{{ arima_predicted | tojson }}');
+            createMultiLineChart("arima-chart", arimaActual, arimaPredicted, "ARIMA Model: Actual vs Predicted", "arima-voronoi");
+        });
+        
+        document.getElementById("lstm-voronoi").addEventListener("change", function() {
+            var lstmActual = JSON.parse('{{ lstm_actual | tojson }}');
+            var lstmPredicted = JSON.parse('{{ lstm_predicted | tojson }}');
+            createMultiLineChart("lstm-chart", lstmActual, lstmPredicted, "LSTM Model: Actual vs Predicted", "lstm-voronoi");
+        });
+        
+        document.getElementById("lr-voronoi").addEventListener("change", function() {
+            var lrActual = JSON.parse('{{ lr_actual | tojson }}');
+            var lrPredicted = JSON.parse('{{ lr_predicted | tojson }}');
+            createMultiLineChart("lr-chart", lrActual, lrPredicted, "Linear Regression Model: Actual vs Predicted", "lr-voronoi");
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener("resize", function() {
+        // Re-render charts on window resize
+        setTimeout(function() {
+            var arimaActual = JSON.parse('{{ arima_actual | tojson }}');
+            var arimaPredicted = JSON.parse('{{ arima_predicted | tojson }}');
+            createMultiLineChart("arima-chart", arimaActual, arimaPredicted, "ARIMA Model: Actual vs Predicted", "arima-voronoi");
+            
+            var lstmActual = JSON.parse('{{ lstm_actual | tojson }}');
+            var lstmPredicted = JSON.parse('{{ lstm_predicted | tojson }}');
+            createMultiLineChart("lstm-chart", lstmActual, lstmPredicted, "LSTM Model: Actual vs Predicted", "lstm-voronoi");
+            
+            var lrActual = JSON.parse('{{ lr_actual | tojson }}');
+            var lrPredicted = JSON.parse('{{ lr_predicted | tojson }}');
+            createMultiLineChart("lr-chart", lrActual, lrPredicted, "Linear Regression Model: Actual vs Predicted", "lr-voronoi");
+        }, 100);
+    });
+</script>
+<style>
+    /* Add some basic styling for tooltips */
+    .tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px;
+        border-radius: 3px;
+        font-size: 12px;
+        pointer-events: none;
+    }
+    
+    /* Style for grid lines */
+    .grid line {
+        stroke: #eee;
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+    }
+    
+    .grid path {
+        stroke-width: 0;
+    }
+    
+    /* Style for controls */
+    #arima-controls, #lstm-controls, #lr-controls {
+        margin-bottom: 10px;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 14px;
+    }
+    
+    #arima-controls input, #lstm-controls input, #lr-controls input {
+        margin-left: 5px;
+    }
+
+    /* Polished Yahoo Finance link beside the 7‑day forecast */
+    .yahoo-link-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 8px 0;
+    }
+
+    .btn-yahoo-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid #4B73B1;
+        background: #f5f8ff;
+        color: #2f4b8f;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-yahoo-link:hover {
+        background: #e3ebff;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: #223463;
+    }
+
+    .btn-yahoo-icon {
+        font-size: 12px;
+    }
+
+    .yahoo-link-subtitle {
+        margin-top: 4px;
+        font-size: 11px;
+        color: #7b8a9a;
+    }
+</style>
 </body>
-
 </html>
-
