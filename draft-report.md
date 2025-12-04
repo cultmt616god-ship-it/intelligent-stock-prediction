@@ -2,7 +2,7 @@ ABSTRACT
 
 The financial market generates a massive volume of data every second, making it difficult for individual investors to analyze and make timely decisions. Existing tools either track prices or offer basic trading, but they rarely combine intelligent forecasting with integrated portfolio management in a single, user‑friendly platform.
 
-This project presents a Share Market Management and Prediction System that integrates customer profiles, stock data, and predictive analytics into one full‑stack web application. The system provides simulated buy/sell transactions, fund and dividend tracking, broker commission management, and an admin monitoring dashboard. On the prediction side, an LSTM‑based model (with classical ARIMA and Linear Regression baselines) forecasts future stock trends using historical prices, while a sentiment analysis module aggregates recent financial‑news sentiment to give additional context. The backend is implemented in Python using Flask, with a SQLite database and responsive web interfaces, and the prediction outputs are visualised through interactive D3‑based charts and summary widgets on the results page.
+This project presents a Stock Analysis & Market Sentiment system that integrates customer profiles, stock data, and predictive analytics into one full‑stack web application. The system provides simulated buy/sell transactions, fund and dividend tracking, broker commission management, and an admin monitoring dashboard. On the prediction side, an LSTM‑based model (with classical ARIMA and Linear Regression baselines) forecasts future stock trends using historical prices, while a sentiment analysis module aggregates recent financial‑news sentiment to give additional context. The backend is implemented in Python using Flask, with a SQLite database and responsive web interfaces, and the prediction outputs are visualised through interactive D3‑based charts and summary widgets on the results page.
 
 The proposed system is intended for students, researchers, and amateur investors who wish to explore stock prediction and portfolio management in a safe, simulated environment. It closes gaps in the literature by embedding forecasting models into an end‑to‑end management workflow with explainable dashboards rather than providing prediction in isolation.
 
@@ -11,7 +11,7 @@ The proposed system is intended for students, researchers, and amateur investors
 
 1.1 Objectives
 
-The main objectives of the Share Market Management and Prediction System are:
+The main objectives of the Stock Analysis & Market Sentiment system are:
 
 1. To design and implement a web‑based platform for simulated trading and portfolio management.
 2. To develop machine learning models (LSTM with ARIMA/Linear Regression baselines) for next‑day stock price prediction.
@@ -33,7 +33,7 @@ Traditional systems and many academic prototypes either focus on pure prediction
 · Integrated management of customer profiles, brokers, and commissions.
 · Transparent, educational dashboards that support learning and experimentation.
 
-This project therefore specifies and implements a Share Market Management and Prediction System that:
+This project therefore specifies and implements a Stock Analysis & Market Sentiment system that:
 
 · Provides user accounts, portfolios, and a virtual wallet for simulated trading.
 · Enables stock buy/sell operations, dividend recording, and fund tracking.
@@ -215,11 +215,11 @@ These can be represented in UML as use‑case diagrams and an E‑R diagram show
 
 ![ER Diagram](docs/diagrams/exported/er_diagram.png)
 
-Figure 1: Entity-Relationship Diagram of the Share Market Management System
+Figure 1: Entity-Relationship Diagram of the Stock Analysis & Market Sentiment System
 
 ![Use Case Diagram](docs/diagrams/exported/usecase_diagram.png)
 
-Figure 2: Use Case Diagram of the Share Market Management System
+Figure 2: Use Case Diagram of the Stock Analysis & Market Sentiment System
 
 4.4.2 Data Flow Diagrams (DFD)
 
@@ -303,7 +303,7 @@ Quantitative evaluation (e.g., RMSE, MAE, directional accuracy) can be performed
 
 7. CONCLUSION, SUMMARY AND FUTURE SCOPE
 
-This project developed a Share Market Management and Prediction System that combines simulated trading, portfolio management, and stock price prediction within a unified web application. The system enables users to register, manage a virtual wallet, execute buy/sell trades, record dividends, and view an integrated dashboard. Admin users can manage companies and brokers, monitor transaction volumes, and track commission income.
+This project developed a Stock Analysis & Market Sentiment system that combines simulated trading, portfolio management, and stock price prediction within a unified web application. The system enables users to register, manage a virtual wallet, execute buy/sell trades, record dividends, and view an integrated dashboard. Admin users can manage companies and brokers, monitor transaction volumes, and track commission income.
 
 On the analytics side, the project integrates an LSTM model with classical baselines and sentiment analysis of financial news. This aligns with recent research trends that highlight the value of combining historical and textual information. Unlike many prior works, however, the proposed system embeds these models into a practical management interface aimed at education and experimentation.
 
