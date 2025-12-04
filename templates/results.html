@@ -574,9 +574,9 @@
 
         // Compute the points in pixel space as [x, y, z], where z is the name of the series.
         const points = [];
-        actualPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type]));
-        predictedPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type]));
-
+        actualPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type, d.value, d.index]));
+        predictedPoints.forEach(d => points.push([xScale(d.index), yScale(d.value), d.type, d.value, d.index]));
+        
         // Add Voronoi overlay if checkbox is checked
         const voronoiCheckbox = document.getElementById(voronoiToggleId);
         if (voronoiCheckbox && voronoiCheckbox.checked) {
@@ -613,10 +613,10 @@
             .attr("class", "actual-point")
             .attr("cx", d => xScale(d.index))
             .attr("cy", d => yScale(d.value))
-            .attr("r", 3)
+            .attr("r", 0)
             .attr("fill", "#1F77B4")
             .on("mouseover", function(event, d) {
-                d3.select(this).attr("r", 5);
+                d3.select(this).attr("r", 0);
                 // Add tooltip
                 const tooltip = d3.select("#" + containerId).append("div")
                     .attr("class", "tooltip")
@@ -636,7 +636,7 @@
                     .style("opacity", .9);
             })
             .on("mouseout", function() {
-                d3.select(this).attr("r", 3);
+                d3.select(this).attr("r", 0);
                 // Remove tooltip
                 d3.selectAll(".tooltip").remove();
             });
@@ -648,10 +648,10 @@
             .attr("class", "predicted-point")
             .attr("cx", d => xScale(d.index))
             .attr("cy", d => yScale(d.value))
-            .attr("r", 3)
+            .attr("r", 0)
             .attr("fill", "#4B73B1")
             .on("mouseover", function(event, d) {
-                d3.select(this).attr("r", 5);
+                d3.select(this).attr("r", 0);
                 // Add tooltip
                 const tooltip = d3.select("#" + containerId).append("div")
                     .attr("class", "tooltip")
@@ -671,7 +671,7 @@
                     .style("opacity", .9);
             })
             .on("mouseout", function() {
-                d3.select(this).attr("r", 3);
+                d3.select(this).attr("r", 0);
                 // Remove tooltip
                 d3.selectAll(".tooltip").remove();
             });
@@ -727,16 +727,26 @@
             .style("font-weight", "bold")
             .text(title);
             
-        // Add interactive tip
+        // Add interactive tip (hover slider + moving dot)
         const focus = svg.append("g")
             .attr("display", "none");
             
+        focus.append("line")
+            .attr("class", "hover-line")
+            .attr("y1", 0)
+            .attr("y2", height)
+            .attr("stroke", "#999")
+            .attr("stroke-dasharray", "3,3");
+            
         focus.append("circle")
-            .attr("r", 2.5);
+            .attr("class", "hover-dot")
+            .attr("r", 4)
+            .attr("fill", "#000");
             
         focus.append("text")
+            .attr("class", "hover-text")
             .attr("text-anchor", "middle")
-            .attr("y", -8);
+            .attr("y", -10);
             
         // Add event listeners for interactivity
         svg.on("pointerenter", () => pointerentered(svg, points, actualPoints, predictedPoints, focus, xScale, yScale))
@@ -749,7 +759,7 @@
     function pointermoved(event, svg, points, actualPoints, predictedPoints, focus, xScale, yScale) {
         const [xm, ym] = d3.pointer(event);
         const i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
-        const [x, y, k] = points[i];
+        const [x, y, k, value, index] = points[i];
         
         // Highlight the corresponding line
         const path = svg.selectAll("path");
@@ -758,8 +768,16 @@
             return "#ddd";
         }).filter((d) => d && d[0] && d[0].type === k).raise();
         
-        focus.attr("transform", `translate(${x},${y})`);
-        focus.select("text").text(k);
+        // Move the hover group so the vertical line follows the cursor on X
+        focus.attr("transform", `translate(${x},0)`);
+
+        // Position the moving dot and label at the closest data point
+        focus.select("circle")
+            .attr("cy", y);
+
+        focus.select("text")
+            .attr("y", y - 10)
+            .text(`${k}: ${value.toFixed(2)} (t=${index})`);
         
         // Dispatch input event (optional)
         svg.node().value = points[i];
