@@ -609,7 +609,7 @@ def predict():
             Quantity_date = Quantity_date.fillna(Quantity_date.bfill())
             Quantity_date = Quantity_date.drop(['Date'],axis =1)
             fig = plt.figure(figsize=(7.2,4.8),dpi=65)
-            plt.plot(Quantity_date, linestyle=':', color='#1F77B4')
+            plt.plot(Quantity_date, color='#1F77B4')
             plt.savefig('static/Trends.png')
             plt.close(fig)
             
@@ -618,6 +618,10 @@ def predict():
             train, test = quantity[0:size], quantity[size:len(quantity)]
             #fit in model
             predictions = arima_model(train, test)
+            
+            # Store data for D3 visualization
+            arima_actual = test.flatten().tolist()
+            arima_predicted = predictions
             
             #plot graph
             fig = plt.figure(figsize=(7.2,4.8),dpi=65)
@@ -634,7 +638,7 @@ def predict():
             error_arima = math.sqrt(mean_squared_error(test, predictions))
             print("ARIMA RMSE:",error_arima)
             print("##############################################################################")
-            return arima_pred, error_arima
+            return arima_pred, error_arima, arima_actual, arima_predicted
         
         
 
@@ -742,6 +746,11 @@ def predict():
         
         #Getting original prices back from scaled values
         predicted_stock_price=sc.inverse_transform(predicted_stock_price)
+        
+        # Store data for D3 visualization
+        lstm_actual = real_stock_price.flatten().tolist()
+        lstm_predicted = predicted_stock_price.flatten().tolist()
+        
         fig = plt.figure(figsize=(7.2,4.8),dpi=65)
         plt.plot(real_stock_price, label='Actual Price', linestyle=':', color='#1F77B4')  
         plt.plot(predicted_stock_price, label='Predicted Price', color='#4B73B1')
@@ -766,7 +775,7 @@ def predict():
         print("Tomorrow's ",quote," Closing Price Prediction by LSTM: ",lstm_pred)
         print("LSTM RMSE:",error_lstm)
         print("##############################################################################")
-        return lstm_pred,error_lstm
+        return lstm_pred,error_lstm,lstm_actual,lstm_predicted
     #***************** LINEAR REGRESSION SECTION ******************       
     def LIN_REG_ALGO(df):
         #No of days to be forcasted in future
@@ -806,6 +815,11 @@ def predict():
         #Testing
         y_test_pred=clf.predict(X_test)
         y_test_pred=y_test_pred*(1.04)
+        
+        # Store data for D3 visualization
+        lr_actual = y_test.flatten().tolist()
+        lr_predicted = y_test_pred.flatten().tolist()
+        
         import matplotlib.pyplot as plt2
         fig = plt2.figure(figsize=(7.2,4.8),dpi=65)
         plt2.plot(y_test, label='Actual Price', linestyle=':', color='#1F77B4')
@@ -828,8 +842,7 @@ def predict():
         print("Tomorrow's ",quote," Closing Price Prediction by Linear Regression: ",lr_pred)
         print("Linear Regression RMSE:",error_lr)
         print("##############################################################################")
-        return df, lr_pred, forecast_set, mean, error_lr
-
+        return df, lr_pred, forecast_set, mean, error_lr, lr_actual, lr_predicted
 
     def recommending(df, global_polarity,today_stock,mean):
             count=20 #Num of tweets to be displayed on web page
@@ -919,9 +932,9 @@ def predict():
         df=df2
 
 
-        arima_pred, error_arima=ARIMA_ALGO(df)
-        lstm_pred, error_lstm=LSTM_ALGO(df)
-        df, lr_pred, forecast_set,mean,error_lr=LIN_REG_ALGO(df)
+        arima_pred, error_arima, arima_actual, arima_predicted=ARIMA_ALGO(df)
+        lstm_pred, error_lstm, lstm_actual, lstm_predicted=LSTM_ALGO(df)
+        df, lr_pred, forecast_set,mean,error_lr, lr_actual, lr_predicted=LIN_REG_ALGO(df)
         
         # Use FREE news-based sentiment analysis instead of Twitter
         print()
@@ -940,7 +953,10 @@ def predict():
                                close_s=today_stock['Close'].to_string(index=False),
                                sentiment_list=sentiment_list,sentiment_pol=sentiment_pol,idea=idea,decision=decision,high_s=today_stock['High'].to_string(index=False),
                                low_s=today_stock['Low'].to_string(index=False),vol=today_stock['Volume'].to_string(index=False),
-                               forecast_set=forecast_set,error_lr=round(error_lr,2),error_lstm=round(error_lstm,2),error_arima=round(error_arima,2))
+                               forecast_set=forecast_set,error_lr=round(error_lr,2),error_lstm=round(error_lstm,2),error_arima=round(error_arima,2),
+                               arima_actual=arima_actual, arima_predicted=arima_predicted,
+                               lstm_actual=lstm_actual, lstm_predicted=lstm_predicted,
+                               lr_actual=lr_actual, lr_predicted=lr_predicted)
 if __name__ == '__main__':
    app.run()
    
