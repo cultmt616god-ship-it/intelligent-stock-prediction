@@ -608,7 +608,7 @@ def predict():
             Quantity_date['Price'] = Quantity_date['Price'].map(lambda x: float(x))
             Quantity_date = Quantity_date.fillna(Quantity_date.bfill())
             Quantity_date = Quantity_date.drop(['Date'],axis =1)
-            fig = plt.figure(figsize=(7.2,4.8),dpi=65)
+            fig = plt.figure(figsize=(7.2,4.8),dpi=75)
             plt.plot(Quantity_date, color='#1F77B4')
             plt.savefig('static/Trends.png')
             plt.close(fig)
